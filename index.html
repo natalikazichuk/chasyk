@@ -26,7 +26,7 @@ html,body{min-height:100%}
 body{background:var(--bg);color:var(--ink);font-family:"Segoe UI Rounded","Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font:inherit;color:inherit;cursor:pointer}
 input,select{font:inherit;color:inherit}
-#app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:10px 16px calc(16px + env(safe-area-inset-bottom))}
+#app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
 .muted{color:var(--muted)}
 
 /* ---------- верхня панель ---------- */
@@ -115,6 +115,9 @@ input,select{font:inherit;color:inherit}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .row.end{justify-content:flex-end}
 .row .grow{flex:1}
+.edit-actions{flex-wrap:nowrap;margin-top:8px}
+.edit-actions .btn{padding:11px 12px;white-space:nowrap;min-width:0}
+.edit-actions .danger{margin-right:auto}
 label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:var(--muted)}
 input[type=text],input[type=time],input[inputmode],select{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;font-size:17px;color:var(--ink);width:100%;min-height:46px}
 input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
@@ -377,12 +380,14 @@ const fromTemplate = t => ({ id: uid(), tk: t.tk, name: '', start: t.start, days
 
 /* ---------- стан ---------- */
 let state;
+// Ключ стандартної назви за текстом будь-якою мовою (щоб «Обід» і «Lunch» були однією справою)
+function keyOf(prefix, name) {
+  for (const l of LANGS) for (const [k, v] of Object.entries(DICT[l])) if (k.startsWith(prefix) && v === name) return k.slice(prefix.length);
+  return null;
+}
 function migrate() {
   // Дані з першої версії: назви були російською без ключів. Стандартні назви отримують ключі, щоб перекладатися.
-  const findKey = (prefix, name) => {
-    for (const l of LANGS) for (const [k, v] of Object.entries(DICT[l])) if (k.startsWith(prefix) && v === name) return k.slice(prefix.length);
-    return null;
-  };
+  const findKey = keyOf;
   for (const r of state.routines) {
     if (!r.tk && r.name) { const k = findKey('t.', r.name); if (k) { r.tk = k; r.name = ''; } }
     for (const t of r.tasks) if (!t.tk && t.name) { const k = findKey('k.', t.name); if (k) { t.tk = k; t.name = ''; } }
@@ -432,8 +437,18 @@ function chime() {
     });
   } catch (e) {}
 }
-let wl = null;
+// Android-застосунок (Capacitor): нативні плагіни замість браузерних API
+const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const plug = n => (NATIVE && window.Capacitor.Plugins && window.Capacitor.Plugins[n]) || null;
+let wl = null, nativeAwake = false;
 async function keepAwake(on) {
+  const ka = plug('KeepAwake');
+  if (ka) {
+    if (on === nativeAwake) return;
+    nativeAwake = on;
+    try { await (on ? ka.keepAwake() : ka.allowSleep()); } catch (e) {}
+    return;
+  }
   try {
     if (on && !wl && 'wakeLock' in navigator && document.visibilityState === 'visible') {
       wl = await navigator.wakeLock.request('screen');
@@ -463,18 +478,34 @@ function autoRoutine() {
   return best;
 }
 function startRun(r) {
-  state.run = { rid: r.id, date: dayKey(), idx: 0, t0: Date.now(), alerted: false };
+  state.run = { rid: r.id, date: dayKey(), s0: Date.now(), idx: 0, t0: Date.now(), alerted: false };
   save();
 }
 function validRun() {
   const run = state.run;
   if (!run) return null;
   const r = routine(run.rid);
-  if (run.date !== dayKey() || !r || run.idx >= r.tasks.length) { state.run = null; save(); return null; }
+  // Розпорядок може перейти через північ: обриваємо його лише якщо він іде надто довго
+  const age = Date.now() - (run.s0 || run.t0), maxAge = (total(r || { tasks: [] }) + 180) * 60000;
+  if (!r || run.idx >= r.tasks.length || age > maxAge || (!run.s0 && run.date !== dayKey())) { state.run = null; save(); return null; }
   return run;
 }
 
 /* ---------- екран дитини ---------- */
+// Якщо змінили розпорядок, що зараз іде: лишаємо дитину на тій самій справі, а якщо її прибрали — таймер з нуля
+function fixRun(old, d) {
+  const run = state.run;
+  if (!run || !old || run.rid !== d.id) return;
+  const cur = old.tasks[run.idx], same = x => cur && x.icon === cur.icon && (x.tk || '') === (cur.tk || '') && x.name === cur.name;
+  const j = cur ? d.tasks.findIndex(same) : -1;
+  if (j >= 0) {
+    run.idx = j;
+    if (d.tasks[j].min !== cur.min) run.alerted = false;
+  } else {
+    run.idx = Math.min(run.idx, d.tasks.length - 1); run.t0 = Date.now(); run.alerted = false;
+  }
+}
+
 let view = 'child', pTab = 'routines', draft = null, lastDone = 0, idleSig = '';
 
 function gearHTML() {
@@ -494,7 +525,8 @@ function rewardHTML() {
 function renderChild() {
   view = 'child';
   document.title = T('appName');
-  const h = hist(), run = validRun(), r = run && routine(run.rid);
+  if (state.finished && state.finished.date !== dayKey()) { state.finished = null; save(); }
+  const run = validRun(), r = run && routine(run.rid), h = hist(run ? run.date : undefined); // після півночі зірки — у день початку
   let body;
   if (state.finished) {
     const f = state.finished;
@@ -541,7 +573,7 @@ function updateTimer() {
   const t = r.tasks[run.idx], plan = t.min * 60000, el = Date.now() - run.t0;
   const left = plan - el, f = Math.max(0, left / plan);
   pie.setAttribute('stroke-dasharray', `${(f * 150.8).toFixed(2)} 151`);
-  pie.style.stroke = f > 0.5 ? 'var(--green)' : f > 0.25 ? 'var(--yellow)' : 'var(--red)';
+  pie.style.stroke = f > 0.25 ? 'var(--green)' : left > 0 ? 'var(--yellow)' : 'var(--red)'; // червоний — лише коли час вийшов
   $('#timer').classList.toggle('over', left <= 0);
   const big = $('#tBig'), small = $('#tSmall');
   if (left > 0) {
@@ -642,9 +674,8 @@ function editorHTML() {
         <div class="t-tools"><button onclick="A.tmove(${i},-1)" ${i ? '' : 'disabled'} aria-label="${esc(T('up'))}">↑</button><button onclick="A.tmove(${i},1)" ${i < d.tasks.length - 1 ? '' : 'disabled'} aria-label="${esc(T('down'))}">↓</button><button onclick="A.tdel(${i})" aria-label="${esc(T('del'))}">✕</button></div>
       </div></div>`).join('')}
     <button class="btn" onclick="A.tadd()">${esc(T('addTask'))}</button>
-    <div class="row end" style="margin-top:8px">
+    <div class="row end edit-actions">
       ${d.isNew ? '' : `<button class="btn danger" onclick="A.rdel()">${esc(T('del'))}</button>`}
-      <span class="grow"></span>
       <button class="btn" onclick="A.cancelEdit()">${esc(T('cancel'))}</button>
       <button class="btn primary" onclick="A.save()">${esc(T('save'))}</button></div>`;
 }
@@ -660,7 +691,8 @@ function statsHTML() {
   }
   const agg = {};
   for (const h of Object.values(state.history)) for (const t of h.tasks) {
-    const k = t.icon + ' ' + t.name;
+    const tk = t.tk || keyOf('k.', t.name);
+    const k = t.icon + ' ' + (tk ? T('k.' + tk) : t.name);
     const a = agg[k] || (agg[k] = { n: 0, late: 0, sum: 0, plan: t.plan });
     a.n++; a.late += t.late ? 1 : 0; a.sum += t.actual; a.plan = t.plan;
   }
@@ -718,8 +750,8 @@ function settingsHTML() {
     </div>
     ${run ? `<div class="card"><b>${esc(T('running', { name: rname(routine(run.rid)) }))}</b>
       <div class="row"><button class="btn" onclick="A.skipTask()">${esc(T('skip'))}</button><button class="btn" onclick="A.stopRun()">${esc(T('stop'))}</button></div></div>` : ''}
-    <div class="card"><b>${esc(T('installTitle'))}</b>
-      <p class="small">${esc(T('installText'))}</p>
+    <div class="card">${NATIVE ? '' : `<b>${esc(T('installTitle'))}</b>
+      <p class="small">${esc(T('installText'))}</p>`}
       <p class="small muted">${esc(T('privacy'))}</p></div>
     <button class="btn danger" onclick="A.reset()">${esc(T('resetAll'))}</button>`;
 }
@@ -730,15 +762,15 @@ const A = {
     const run = validRun(); if (!run) return renderChild();
     if (Date.now() - lastDone < 900) return; // захист від подвійного натискання
     lastDone = Date.now(); unlockAudio();
-    const r = routine(run.rid), t = r.tasks[run.idx], h = hist();
+    const r = routine(run.rid), t = r.tasks[run.idx], h = hist(run.date);
     const actual = (Date.now() - run.t0) / 60000;
-    h.tasks.push({ icon: t.icon, name: tname(t), plan: t.min, actual: Math.round(actual * 10) / 10, late: actual > t.min });
+    h.tasks.push({ icon: t.icon, tk: t.tk, name: tname(t), plan: t.min, actual: Math.round(actual * 10) / 10, late: actual > t.min });
     h.stars++;
     if (state.reward.on) state.reward.stars++;
     run.idx++;
     if (run.idx >= r.tasks.length) {
       h.done[r.id] = true;
-      state.finished = { name: rname(r), stars: r.tasks.length };
+      state.finished = { name: rname(r), stars: r.tasks.length, date: dayKey() };
       state.run = null;
     } else { run.t0 = Date.now(); run.alerted = false; }
     save(); flyStar();
@@ -800,7 +832,9 @@ const A = {
     if (!d.days.length) return toast(T('needDay'));
     delete d.isNew;
     const i = state.routines.findIndex(r => r.id === d.id);
+    const old = i >= 0 ? state.routines[i] : null;
     i >= 0 ? (state.routines[i] = d) : state.routines.push(d);
+    fixRun(old, d);
     draft = null; save(); validRun(); renderParent(); toast(T('saved'));
   },
   rdel() {
@@ -818,12 +852,12 @@ const A = {
   skipTask() {
     const run = validRun(); if (!run) return;
     const r = routine(run.rid); run.idx++; run.t0 = Date.now(); run.alerted = false;
-    if (run.idx >= r.tasks.length) { hist().done[r.id] = true; state.run = null; }
+    if (run.idx >= r.tasks.length) { hist(run.date).done[r.id] = true; state.run = null; }
     save(); renderParent(); toast(T('skipped'));
   },
   stopRun() {
     const run = validRun(); if (!run) return;
-    hist().done[run.rid] = true; // щоб не запустився знову сьогодні
+    hist(run.date).done[run.rid] = true; // щоб не запустився знову сьогодні
     state.run = null; save(); renderParent(); toast(T('stopped'));
   },
   reset() {
@@ -857,7 +891,18 @@ document.addEventListener('pointerdown', unlockAudio, { once: true });
 load(); save(); renderChild();
 setInterval(tick, 1000); tick();
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+// Кнопка «Назад» на Android: закрити вікно → вийти з режиму дорослого → згорнути застосунок
+if (plug('App')) {
+  try {
+    plug('App').addListener('backButton', () => {
+      if ($('#modal')) return closeModal();
+      if (view === 'parent') return draft ? A.cancelEdit() : A.exitParent();
+      plug('App').minimizeApp();
+    });
+  } catch (e) {}
+}
+
+if (!NATIVE && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 </script>

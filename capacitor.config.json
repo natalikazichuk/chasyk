@@ -1,6 +1,6 @@
 {
   "appId": "io.github.natalikazichuk.chasyk",
-  "appName": "Час і К°",
+  "appName": "CHASIC",
   "webDir": "www",
   "android": { "backgroundColor": "#fdf8f0" }
 }

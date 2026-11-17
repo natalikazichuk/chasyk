@@ -1,5 +1,5 @@
 // Часик: офлайн-кэш. Сначала сеть (чтобы обновления приходили), без сети — кэш.
-const CACHE = 'chasyk-v3';
+const CACHE = 'chasyk-v4';
 const FILES = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

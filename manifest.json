@@ -1,13 +1,14 @@
 {
-  "name": "Часик — трекер времени для ребёнка",
+  "name": "Часик — трекер часу для дитини",
   "short_name": "Часик",
+  "description": "Простий трекер часу для дитини: справа, круг, що тане, і кнопка «Готово».",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fdf8f0",
   "theme_color": "#5b8def",
-  "lang": "ru",
+  "lang": "uk",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

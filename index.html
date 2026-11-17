@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Часик</title>
-<meta name="description" content="Простой трекер времени для ребёнка: дело, тающий круг и кнопка «Готово».">
+<meta name="description" content="Простий трекер часу для дитини: справа, круг, що тане, і кнопка «Готово».">
 <meta name="theme-color" content="#5b8def">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
@@ -25,11 +25,11 @@
 html,body{min-height:100%}
 body{background:var(--bg);color:var(--ink);font-family:"Segoe UI Rounded","Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font:inherit;color:inherit;cursor:pointer}
-input{font:inherit;color:inherit}
+input,select{font:inherit;color:inherit}
 #app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:10px 16px calc(16px + env(safe-area-inset-bottom))}
 .muted{color:var(--muted)}
 
-/* ---------- верхняя панель ---------- */
+/* ---------- верхня панель ---------- */
 .top{display:flex;align-items:center;gap:10px;min-height:56px}
 .who{font-weight:800;font-size:18px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stars{font-weight:800;font-size:20px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:4px 14px;white-space:nowrap}
@@ -39,7 +39,7 @@ input{font:inherit;color:inherit}
 .gear.hold{opacity:1}
 .gear.hold circle{stroke-dashoffset:0;transition:stroke-dashoffset 3s linear}
 
-/* ---------- экран ребёнка ---------- */
+/* ---------- екран дитини ---------- */
 .child{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:8px 0}
 .now-label{text-transform:uppercase;letter-spacing:.14em;font-size:13px;font-weight:800;color:var(--muted)}
 .task-icon{font-size:clamp(64px,19vw,100px);line-height:1.1}
@@ -85,7 +85,7 @@ input{font:inherit;color:inherit}
 .fly{position:fixed;left:50%;top:50%;font-size:64px;pointer-events:none;z-index:50;animation:fly 0.9s ease-out forwards}
 @keyframes fly{0%{transform:translate(-50%,-50%) scale(.6);opacity:0}25%{transform:translate(-50%,-60%) scale(1.3);opacity:1}100%{transform:translate(-50%,-260%) scale(.8);opacity:0}}
 
-/* ---------- окна и подсказки ---------- */
+/* ---------- вікна і підказки ---------- */
 .modal-bg{position:fixed;inset:0;background:rgba(20,16,28,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
 .modal{background:var(--card);border-radius:22px;padding:22px;width:100%;max-width:380px;max-height:86vh;overflow:auto;display:flex;flex-direction:column;gap:14px}
 .modal h2{font-size:22px}
@@ -97,10 +97,10 @@ input{font:inherit;color:inherit}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;font-size:15px;z-index:60;max-width:calc(100% - 32px);text-align:center;animation:fade 2.4s forwards}
 @keyframes fade{0%{opacity:0}10%,80%{opacity:1}100%{opacity:0}}
 
-/* ---------- режим взрослого ---------- */
+/* ---------- режим дорослого ---------- */
 .parent{display:flex;flex-direction:column;gap:12px;padding-bottom:24px}
 .parent h3{font-size:17px;margin-top:8px}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 10px}
 .tabs button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:700;font-size:15px}
 .tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
@@ -116,16 +116,16 @@ input{font:inherit;color:inherit}
 .row.end{justify-content:flex-end}
 .row .grow{flex:1}
 label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:var(--muted)}
-input[type=text],input[type=time],input[type=number],input[inputmode]{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;font-size:17px;color:var(--ink);width:100%;min-height:46px}
-input:focus{outline:2px solid var(--accent);outline-offset:1px}
+input[type=text],input[type=time],input[inputmode],select{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;font-size:17px;color:var(--ink);width:100%;min-height:46px}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .day{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-weight:700;font-size:14px;padding:0}
 .day.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .t-row{display:grid;grid-template-columns:50px 1fr;gap:8px 10px;align-items:center;padding:10px}
 .ico{height:50px;border-radius:14px;border:1px solid var(--line);background:var(--bg);font-size:28px}
-.t-row .t-bottom{grid-column:1/-1;flex-wrap:nowrap}
 .t-row input{min-height:42px;padding:8px 10px;font-size:16px}
 .t-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.t-row .t-bottom{grid-column:1/-1;flex-wrap:nowrap}
 .step{display:flex;align-items:center;gap:6px}
 .step button,.t-tools button{width:40px;height:40px;flex:none;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-weight:800;font-size:18px}
 .step b{min-width:30px;text-align:center;font-size:17px}
@@ -140,6 +140,7 @@ input:focus{outline:2px solid var(--accent);outline-offset:1px}
 .tip{font-size:15px;line-height:1.45}
 .tip b{font-weight:800}
 .small{font-size:14px;line-height:1.5}
+.tz-now{font-size:15px;color:var(--ink);font-weight:700}
 </style>
 </head>
 <body>
@@ -148,8 +149,9 @@ input:focus{outline:2px solid var(--accent);outline-offset:1px}
 <script>
 'use strict';
 /* =========================================================
-   Часик — трекер времени для ребёнка.
-   Всё хранится в localStorage на этом устройстве.
+   Часик — трекер часу для дитини.
+   Мови: українська, англійська, російська.
+   Усе зберігається в localStorage на цьому пристрої.
    ========================================================= */
 const KEY = 'chasyk.v1';
 const $ = s => document.querySelector(s);
@@ -157,41 +159,251 @@ const app = $('#app');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2, 9);
 const pad = n => String(n).padStart(2, '0');
-const dayKey = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const hm = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
-const minsNow = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
-const total = r => r.tasks.reduce((a, t) => a + t.min, 0);
 const rand = n => Math.floor(Math.random() * n);
 
+/* ---------- переклади ---------- */
+const DICT = {
+  uk: {
+    langName: 'Українська', appName: 'Часик',
+    now: 'Зараз', next: 'Далі', last: 'Це остання справа! 💪', done: '✓ Готово',
+    min: 'хв', sec: 'с', left: 'залишилось', timeUp: 'Час вийшов', finishUp: 'закінчуй і тисни «Готово»',
+    wellDone: 'Молодець!', allDone: '«{name}» — усе зроблено', hooray: 'Ура!',
+    free: 'Вільний час', atTime: 'О {t} — «{name}»', relax: 'Можна відпочивати',
+    startEarly: 'Можна почати раніше — натисни на картку', noRoutinesChild: 'На сьогодні розпорядків немає. Дорослий може додати їх у налаштуваннях ⚙️',
+    doneMark: '✓ готово', starsToday: 'Зірки за сьогодні', rewardGot: 'Нагороду зароблено! Скажи дорослому',
+    gearLabel: 'Для дорослих: утримуйте 3 секунди', gearToast: 'Для дорослих: утримуйте ⚙️ 3 секунди',
+    forAdults: 'Для дорослих', answer: 'Відповідь', cancel: 'Скасувати', enter: 'Увійти',
+    parentMode: 'Режим дорослого', toChild: 'До дитини →',
+    tabRoutines: 'Розпорядки', tabStats: 'Підсумки', tabReward: 'Нагорода', tabSettings: 'Налаштування',
+    everyDay: 'щодня', weekdays: 'будні', weekend: 'вихідні', noDays: 'дні не вибрано',
+    tasksN: { one: 'справа', few: 'справи', many: 'справ', other: 'справи' },
+    edit: 'Змінити', noRoutines: 'Поки немає розпорядків. Додайте свій або візьміть шаблон.',
+    newRoutine: '+ Новий розпорядок', templates: 'Шаблони',
+    autoNote: 'Розпорядок вмикається сам у вказаний час і триває, доки дитина не закінчить (або ще годину після планового кінця).',
+    name: 'Назва', start: 'Початок', tasks: 'Справи', total: 'усього {n} хв',
+    changeIcon: 'Змінити картинку', taskName: 'Назва справи', less: 'Менше', more: 'Більше',
+    up: 'Вище', down: 'Нижче', del: 'Видалити', addTask: '+ Додати справу', save: 'Зберегти',
+    newRoutineName: 'Новий розпорядок', firstTask: 'Перша справа', picture: 'Картинка',
+    leaveUnsaved: 'Вийти без збереження змін?', leave: 'Вийти', routineDefault: 'Розпорядок',
+    needTask: 'Додайте хоча б одну справу з назвою', needDay: 'Виберіть хоча б один день', saved: 'Збережено',
+    confirmDel: 'Видалити «{name}»?',
+    weekStars: 'Зірки за тиждень', today: 'Сьогодні', lateNote: '⏰ — скільки справ зайняли більше часу, ніж заплановано.',
+    hardTitle: 'Де бракує часу', noData: 'Даних поки немає — вони з’являться після перших виконаних справ.',
+    allGood: 'Поки все встигає 👍',
+    hardLine: '— не встигає {late} з {n} разів, у середньому {avg} хв замість {plan}. Спробуйте дати {sug} хв.',
+    rewardOn: 'Збирати зірки на нагороду', rewardName: 'Нагорода', starsNeeded: 'Скільки зірок потрібно',
+    nowOf: 'Зараз: {a} з {b} ⭐', rewardGiven: 'Нагороду видано — збираємо знову',
+    rewardNote: 'Зірка дається за кожну зроблену справу. Зірки не забираються.', nextReward: 'Збираємо на наступну нагороду',
+    defaultReward: 'Вибрати мультик на вечір',
+    language: 'Мова', timezone: 'Часовий пояс', tzAuto: 'Автоматично (як на телефоні)', tzPopular: 'Популярні', tzAll: 'Усі пояси',
+    tzNow: 'Зараз за цим часом: {t}', tzNote: 'Розпорядки запускаються за часом цього поясу.',
+    sound: 'Звук, коли час вийшов', running: 'Триває: «{name}»', skip: 'Пропустити поточну справу', stop: 'Зупинити',
+    skipped: 'Справу пропущено', stopped: 'Розпорядок зупинено',
+    installTitle: 'Як поставити на телефон або планшет',
+    installText: 'Відкрийте сторінку в браузері. Android (Chrome): меню ⋮ → «Додати на головний екран». iPhone/iPad (Safari): «Поділитися» → «На початковий екран». Після цього «Часик» працює без інтернету.',
+    privacy: 'Усі дані зберігаються лише на цьому пристрої.',
+    resetAll: 'Скинути всі дані', resetConfirm: 'Видалити всі розпорядки, зірки й історію? Це не можна скасувати.',
+    resetBtn: 'Видалити все', resetDone: 'Дані скинуто',
+    dow: ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'],
+    't.morning': 'Ранок до школи', 't.after': 'Після школи', 't.evening': 'Перед сном', 't.weekend': 'Ранок вихідного',
+    'k.bed': 'Встати й застелити ліжко', 'k.wash': 'Умитися', 'k.teeth': 'Почистити зуби', 'k.dress': 'Одягнутися',
+    'k.breakfast': 'Сніданок', 'k.backpack': 'Зібрати рюкзак', 'k.shoes': 'Взутися', 'k.lunch': 'Обід', 'k.rest': 'Відпочинок',
+    'k.homework': 'Уроки', 'k.tidy': 'Прибрати кімнату', 'k.toys': 'Прибрати іграшки', 'k.shower': 'Душ',
+    'k.pajamas': 'Піжама', 'k.book': 'Книжка', 'k.sleep': 'Спати', 'k.bed2': 'Застелити ліжко',
+  },
+  en: {
+    langName: 'English', appName: 'Chasyk',
+    now: 'Now', next: 'Next', last: 'Last one! 💪', done: '✓ Done',
+    min: 'min', sec: 'sec', left: 'left', timeUp: 'Time’s up', finishUp: 'finish up and tap “Done”',
+    wellDone: 'Well done!', allDone: '“{name}” — all done', hooray: 'Hooray!',
+    free: 'Free time', atTime: 'At {t} — “{name}”', relax: 'Time to relax',
+    startEarly: 'You can start early — tap a card', noRoutinesChild: 'No routines today. A grown-up can add them in settings ⚙️',
+    doneMark: '✓ done', starsToday: 'Stars today', rewardGot: 'Reward earned! Tell a grown-up',
+    gearLabel: 'For grown-ups: hold for 3 seconds', gearToast: 'For grown-ups: hold ⚙️ for 3 seconds',
+    forAdults: 'For grown-ups', answer: 'Answer', cancel: 'Cancel', enter: 'Enter',
+    parentMode: 'Grown-up mode', toChild: 'Back to child →',
+    tabRoutines: 'Routines', tabStats: 'Summary', tabReward: 'Reward', tabSettings: 'Settings',
+    everyDay: 'every day', weekdays: 'weekdays', weekend: 'weekends', noDays: 'no days selected',
+    tasksN: { one: 'task', other: 'tasks' },
+    edit: 'Edit', noRoutines: 'No routines yet. Add your own or use a template.',
+    newRoutine: '+ New routine', templates: 'Templates',
+    autoNote: 'A routine starts by itself at its time and runs until the child finishes (or one hour after its planned end).',
+    name: 'Name', start: 'Start', tasks: 'Tasks', total: '{n} min total',
+    changeIcon: 'Change picture', taskName: 'Task name', less: 'Less', more: 'More',
+    up: 'Up', down: 'Down', del: 'Delete', addTask: '+ Add task', save: 'Save',
+    newRoutineName: 'New routine', firstTask: 'First task', picture: 'Picture',
+    leaveUnsaved: 'Leave without saving changes?', leave: 'Leave', routineDefault: 'Routine',
+    needTask: 'Add at least one task with a name', needDay: 'Pick at least one day', saved: 'Saved',
+    confirmDel: 'Delete “{name}”?',
+    weekStars: 'Stars this week', today: 'Today', lateNote: '⏰ — tasks that took longer than planned.',
+    hardTitle: 'Where time runs short', noData: 'No data yet — it appears after the first finished tasks.',
+    allGood: 'Everything fits so far 👍',
+    hardLine: '— runs late {late} of {n} times, {avg} min on average instead of {plan}. Try giving {sug} min.',
+    rewardOn: 'Collect stars for a reward', rewardName: 'Reward', starsNeeded: 'Stars needed',
+    nowOf: 'Now: {a} of {b} ⭐', rewardGiven: 'Reward given — start again',
+    rewardNote: 'A star for every finished task. Stars are never taken away.', nextReward: 'Saving for the next reward',
+    defaultReward: 'Pick a cartoon for tonight',
+    language: 'Language', timezone: 'Time zone', tzAuto: 'Automatic (phone setting)', tzPopular: 'Popular', tzAll: 'All time zones',
+    tzNow: 'Time there now: {t}', tzNote: 'Routines start by this zone’s time.',
+    sound: 'Sound when time is up', running: 'Running: “{name}”', skip: 'Skip current task', stop: 'Stop',
+    skipped: 'Task skipped', stopped: 'Routine stopped',
+    installTitle: 'How to put it on a phone or tablet',
+    installText: 'Open the page in a browser. Android (Chrome): menu ⋮ → “Add to Home screen”. iPhone/iPad (Safari): Share → “Add to Home Screen”. After that it works offline.',
+    privacy: 'All data stays on this device only.',
+    resetAll: 'Reset all data', resetConfirm: 'Delete all routines, stars and history? This can’t be undone.',
+    resetBtn: 'Delete everything', resetDone: 'Data reset',
+    dow: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    't.morning': 'School morning', 't.after': 'After school', 't.evening': 'Bedtime', 't.weekend': 'Weekend morning',
+    'k.bed': 'Get up and make the bed', 'k.wash': 'Wash face', 'k.teeth': 'Brush teeth', 'k.dress': 'Get dressed',
+    'k.breakfast': 'Breakfast', 'k.backpack': 'Pack the backpack', 'k.shoes': 'Put on shoes', 'k.lunch': 'Lunch', 'k.rest': 'Rest',
+    'k.homework': 'Homework', 'k.tidy': 'Tidy the room', 'k.toys': 'Put away toys', 'k.shower': 'Shower',
+    'k.pajamas': 'Pajamas', 'k.book': 'Book', 'k.sleep': 'Sleep', 'k.bed2': 'Make the bed',
+  },
+  ru: {
+    langName: 'Русский', appName: 'Часик',
+    now: 'Сейчас', next: 'Дальше', last: 'Это последнее дело! 💪', done: '✓ Готово',
+    min: 'мин', sec: 'сек', left: 'осталось', timeUp: 'Время вышло', finishUp: 'заканчивай и жми «Готово»',
+    wellDone: 'Молодец!', allDone: '«{name}» — всё сделано', hooray: 'Ура!',
+    free: 'Свободное время', atTime: 'В {t} — «{name}»', relax: 'Можно отдыхать',
+    startEarly: 'Можно начать раньше — нажми на карточку', noRoutinesChild: 'На сегодня распорядков нет. Взрослый может добавить их в настройках ⚙️',
+    doneMark: '✓ готово', starsToday: 'Звёзды за сегодня', rewardGot: 'Награда заработана! Скажи взрослому',
+    gearLabel: 'Для взрослых: удерживайте 3 секунды', gearToast: 'Для взрослых: удерживайте ⚙️ 3 секунды',
+    forAdults: 'Для взрослых', answer: 'Ответ', cancel: 'Отмена', enter: 'Войти',
+    parentMode: 'Режим взрослого', toChild: 'К ребёнку →',
+    tabRoutines: 'Распорядки', tabStats: 'Итоги', tabReward: 'Награда', tabSettings: 'Настройки',
+    everyDay: 'каждый день', weekdays: 'будни', weekend: 'выходные', noDays: 'дни не выбраны',
+    tasksN: { one: 'дело', few: 'дела', many: 'дел', other: 'дела' },
+    edit: 'Изменить', noRoutines: 'Пока нет распорядков. Добавьте свой или возьмите шаблон.',
+    newRoutine: '+ Новый распорядок', templates: 'Шаблоны',
+    autoNote: 'Распорядок включается сам в указанное время и идёт, пока ребёнок не закончит (или ещё час после планового конца).',
+    name: 'Название', start: 'Начало', tasks: 'Дела', total: 'всего {n} мин',
+    changeIcon: 'Сменить картинку', taskName: 'Название дела', less: 'Меньше', more: 'Больше',
+    up: 'Выше', down: 'Ниже', del: 'Удалить', addTask: '+ Добавить дело', save: 'Сохранить',
+    newRoutineName: 'Новый распорядок', firstTask: 'Первое дело', picture: 'Картинка',
+    leaveUnsaved: 'Выйти без сохранения изменений?', leave: 'Выйти', routineDefault: 'Распорядок',
+    needTask: 'Добавьте хотя бы одно дело с названием', needDay: 'Выберите хотя бы один день', saved: 'Сохранено',
+    confirmDel: 'Удалить «{name}»?',
+    weekStars: 'Звёзды за неделю', today: 'Сегодня', lateNote: '⏰ — сколько дел заняли больше времени, чем запланировано.',
+    hardTitle: 'Где не хватает времени', noData: 'Данных пока нет — они появятся после первых выполненных дел.',
+    allGood: 'Пока всё успевается 👍',
+    hardLine: '— не успевает {late} из {n} раз, в среднем {avg} мин вместо {plan}. Попробуйте дать {sug} мин.',
+    rewardOn: 'Копить звёзды на награду', rewardName: 'Награда', starsNeeded: 'Сколько звёзд нужно',
+    nowOf: 'Сейчас: {a} из {b} ⭐', rewardGiven: 'Награда выдана — копим заново',
+    rewardNote: 'Звезда даётся за каждое сделанное дело. Звёзды не отнимаются.', nextReward: 'Копим на следующую награду',
+    defaultReward: 'Выбрать мультик на вечер',
+    language: 'Язык', timezone: 'Часовой пояс', tzAuto: 'Автоматически (как на телефоне)', tzPopular: 'Популярные', tzAll: 'Все пояса',
+    tzNow: 'Сейчас по этому времени: {t}', tzNote: 'Распорядки запускаются по времени этого пояса.',
+    sound: 'Звук, когда время вышло', running: 'Идёт: «{name}»', skip: 'Пропустить текущее дело', stop: 'Остановить',
+    skipped: 'Дело пропущено', stopped: 'Распорядок остановлен',
+    installTitle: 'Как поставить на телефон или планшет',
+    installText: 'Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «Часик» работает без интернета.',
+    privacy: 'Все данные хранятся только на этом устройстве.',
+    resetAll: 'Сбросить все данные', resetConfirm: 'Удалить все распорядки, звёзды и историю? Это нельзя отменить.',
+    resetBtn: 'Удалить всё', resetDone: 'Данные сброшены',
+    dow: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+    't.morning': 'Утро в школу', 't.after': 'После школы', 't.evening': 'Перед сном', 't.weekend': 'Выходное утро',
+    'k.bed': 'Встать и заправить кровать', 'k.wash': 'Умыться', 'k.teeth': 'Почистить зубы', 'k.dress': 'Одеться',
+    'k.breakfast': 'Завтрак', 'k.backpack': 'Собрать рюкзак', 'k.shoes': 'Обуться', 'k.lunch': 'Обед', 'k.rest': 'Отдых',
+    'k.homework': 'Уроки', 'k.tidy': 'Убрать комнату', 'k.toys': 'Убрать игрушки', 'k.shower': 'Душ',
+    'k.pajamas': 'Пижама', 'k.book': 'Книжка', 'k.sleep': 'Спать', 'k.bed2': 'Заправить кровать',
+  },
+};
+const LANGS = ['uk', 'en', 'ru'];
+let lang = 'uk';
+function T(k, vars) {
+  let s = DICT[lang][k];
+  if (s === undefined) s = DICT.en[k];
+  if (s === undefined) return k;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (_, v) => vars[v]);
+  return s;
+}
+function plural(n, key) {
+  const f = T(key);
+  let r = 'other';
+  try { r = new Intl.PluralRules(lang).select(n); } catch (e) {}
+  return f[r] || f.other;
+}
+function detectLang() {
+  const l = (navigator.language || 'uk').toLowerCase();
+  return l.startsWith('ru') ? 'ru' : l.startsWith('en') ? 'en' : 'uk';
+}
+
+/* ---------- часовий пояс ---------- */
+const WD_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const fmtCache = {};
+function zoneFmt() {
+  const z = state.settings.tz;
+  if (fmtCache[z]) return fmtCache[z];
+  const o = { hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short' };
+  let f;
+  try { f = new Intl.DateTimeFormat('en-US', z === 'auto' ? o : { ...o, timeZone: z }); }
+  catch (e) { state.settings.tz = 'auto'; f = new Intl.DateTimeFormat('en-US', o); }
+  return (fmtCache[z] = f);
+}
+// Дата й час «зараз» (або в момент ms) у вибраному поясі
+function zp(ms = Date.now()) {
+  const o = {};
+  for (const p of zoneFmt().formatToParts(new Date(ms))) o[p.type] = p.value;
+  return { y: +o.year, m: +o.month, d: +o.day, h: (+o.hour) % 24, min: +o.minute, dow: WD_EN.indexOf(o.weekday) };
+}
+const dayKey = (ms) => { const z = zp(ms); return `${z.y}-${pad(z.m)}-${pad(z.d)}`; };
+const minsNow = () => { const z = zp(); return z.h * 60 + z.min; };
+const dowNow = () => zp().dow;
+const POPULAR_TZ = ['Europe/Kyiv','Europe/Kiev','Europe/Warsaw','Europe/Berlin','Europe/Prague','Europe/Vienna','Europe/Rome','Europe/Paris','Europe/Madrid','Europe/Lisbon','Europe/London','Europe/Dublin','Europe/Helsinki','Europe/Vilnius','Europe/Riga','Europe/Tallinn','Europe/Bucharest','Europe/Chisinau','Europe/Istanbul','Asia/Tbilisi','Asia/Jerusalem','Asia/Dubai','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Toronto','Australia/Sydney','UTC'];
+const validTz = z => { try { new Intl.DateTimeFormat('en-US', { timeZone: z }); return true; } catch (e) { return false; } };
+function tzOffset(z) {
+  try {
+    const p = new Intl.DateTimeFormat('en-US', { timeZone: z, timeZoneName: 'shortOffset' }).formatToParts(new Date());
+    return (p.find(x => x.type === 'timeZoneName') || {}).value.replace('GMT', 'UTC') || '';
+  } catch (e) { return ''; }
+}
+function tzLabel(z) { const o = tzOffset(z); return `${z.replace(/_/g, ' ')}${o ? ` (${o === 'UTC' ? 'UTC+0' : o})` : ''}`; }
+
+/* ---------- шаблони ---------- */
 const ICONS = ['🛏️','🚿','🦷','🪥','👕','🧦','🧥','👟','🥣','🍲','🍽️','🍎','💧','💊','🎒','🚌','🚶','📚','✏️','📖','🎹','🎨','🧩','⚽','🤸','🐶','🌱','🧸','🧹','🗑️','🛁','🩳','😴','📵','🎮','📺','🛋️','⏰','🧘','📞'];
-const DOW = [[1,'Пн'],[2,'Вт'],[3,'Ср'],[4,'Чт'],[5,'Пт'],[6,'Сб'],[0,'Вс']];
-const WD = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-
+const DOW_ORDER = [1, 2, 3, 4, 5, 6, 0];
 const TEMPLATES = [
-  { name: 'Утро в школу', start: '07:00', days: [1,2,3,4,5], tasks: [
-    ['🛏️','Встать и заправить кровать',3],['🚿','Умыться',3],['🦷','Почистить зубы',3],
-    ['👕','Одеться',5],['🥣','Завтрак',15],['🎒','Собрать рюкзак',5],['👟','Обуться',3]]},
-  { name: 'После школы', start: '14:00', days: [1,2,3,4,5], tasks: [
-    ['🍲','Обед',20],['🛋️','Отдых',30],['📚','Уроки',45],['🧸','Убрать комнату',10]]},
-  { name: 'Перед сном', start: '20:30', days: [0,1,2,3,4,5,6], tasks: [
-    ['🧸','Убрать игрушки',10],['🛁','Душ',10],['🦷','Почистить зубы',3],
-    ['🩳','Пижама',3],['📖','Книжка',15],['😴','Спать',1]]},
-  { name: 'Выходное утро', start: '09:00', days: [0,6], tasks: [
-    ['🛏️','Заправить кровать',3],['🦷','Почистить зубы',3],['👕','Одеться',5],['🥣','Завтрак',20]]},
+  { tk: 'morning', start: '07:00', days: [1,2,3,4,5], tasks: [['🛏️','bed',3],['🚿','wash',3],['🦷','teeth',3],['👕','dress',5],['🥣','breakfast',15],['🎒','backpack',5],['👟','shoes',3]] },
+  { tk: 'after', start: '14:00', days: [1,2,3,4,5], tasks: [['🍲','lunch',20],['🛋️','rest',30],['📚','homework',45],['🧸','tidy',10]] },
+  { tk: 'evening', start: '20:30', days: [0,1,2,3,4,5,6], tasks: [['🧸','toys',10],['🛁','shower',10],['🦷','teeth',3],['🩳','pajamas',3],['📖','book',15],['😴','sleep',1]] },
+  { tk: 'weekend', start: '09:00', days: [0,6], tasks: [['🛏️','bed2',3],['🦷','teeth',3],['👕','dress',5],['🥣','breakfast',20]] },
 ];
-const fromTemplate = t => ({ id: uid(), name: t.name, start: t.start, days: [...t.days],
-  tasks: t.tasks.map(([icon, name, min]) => ({ icon, name, min })) });
+// Назва розпорядку/справи: стандартні перекладаються, змінені вручну — як написано
+const rname = r => r.tk ? T('t.' + r.tk) : r.name;
+const tname = t => t.tk ? T('k.' + t.tk) : t.name;
+const fromTemplate = t => ({ id: uid(), tk: t.tk, name: '', start: t.start, days: [...t.days],
+  tasks: t.tasks.map(([icon, tk, min]) => ({ icon, tk, name: '', min })) });
 
-/* ---------- состояние ---------- */
+/* ---------- стан ---------- */
 let state;
+function migrate() {
+  // Дані з першої версії: назви були російською без ключів. Стандартні назви отримують ключі, щоб перекладатися.
+  const findKey = (prefix, name) => {
+    for (const l of LANGS) for (const [k, v] of Object.entries(DICT[l])) if (k.startsWith(prefix) && v === name) return k.slice(prefix.length);
+    return null;
+  };
+  for (const r of state.routines) {
+    if (!r.tk && r.name) { const k = findKey('t.', r.name); if (k) { r.tk = k; r.name = ''; } }
+    for (const t of r.tasks) if (!t.tk && t.name) { const k = findKey('k.', t.name); if (k) { t.tk = k; t.name = ''; } }
+  }
+  if (state.reward && state.reward.text) {
+    for (const l of LANGS) if (state.reward.text === DICT[l].defaultReward) state.reward.text = '';
+  }
+}
 function load() {
   try { state = JSON.parse(localStorage.getItem(KEY)); } catch (e) { state = null; }
   if (!state || !Array.isArray(state.routines)) {
     state = { routines: TEMPLATES.slice(0, 3).map(fromTemplate), run: null, history: {},
-      reward: { on: false, goal: 15, text: 'Выбрать мультик на вечер', stars: 0 }, sound: true, finished: null };
+      reward: { on: false, goal: 15, text: '', stars: 0 }, sound: true, finished: null };
   }
-  // храним историю только за 30 дней
-  const cut = dayKey(new Date(Date.now() - 30 * 864e5));
+  if (!state.settings) state.settings = { lang: detectLang(), tz: 'auto' };
+  if (!LANGS.includes(state.settings.lang)) state.settings.lang = 'uk';
+  if (state.settings.tz !== 'auto' && !validTz(state.settings.tz)) state.settings.tz = 'auto';
+  lang = state.settings.lang;
+  document.documentElement.lang = lang;
+  migrate();
+  const cut = dayKey(Date.now() - 30 * 864e5);
   for (const k of Object.keys(state.history)) if (k < cut) delete state.history[k];
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
@@ -199,8 +411,10 @@ function hist(k = dayKey()) {
   return state.history[k] || (state.history[k] = { stars: 0, done: {}, tasks: [] });
 }
 const routine = id => state.routines.find(r => r.id === id);
+const total = r => r.tasks.reduce((a, t) => a + t.min, 0);
+const rewardText = () => state.reward.text || T('defaultReward');
 
-/* ---------- звук, вибрация, экран ---------- */
+/* ---------- звук, вібрація, екран ---------- */
 let ac;
 function unlockAudio() {
   try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {}
@@ -237,14 +451,13 @@ function flyStar() {
   document.body.appendChild(n); setTimeout(() => n.remove(), 1000);
 }
 
-/* ---------- логика распорядка ---------- */
-// Какой распорядок должен идти сейчас (по расписанию)
+/* ---------- логіка розпорядку ---------- */
 function autoRoutine() {
-  const dow = new Date().getDay(), m = minsNow(), h = hist();
+  const dow = dowNow(), m = minsNow(), h = hist();
   let best = null;
   for (const r of state.routines) {
     if (!r.days.includes(dow) || !r.tasks.length || h.done[r.id]) continue;
-    const s = hm(r.start), e = s + total(r) + 60; // окно: длительность + час запаса
+    const s = hm(r.start), e = s + total(r) + 60; // вікно: тривалість + година запасу
     if (m >= s && m < e && (!best || s > hm(best.start))) best = r;
   }
   return best;
@@ -261,11 +474,11 @@ function validRun() {
   return run;
 }
 
-/* ---------- экран ребёнка ---------- */
+/* ---------- екран дитини ---------- */
 let view = 'child', pTab = 'routines', draft = null, lastDone = 0, idleSig = '';
 
 function gearHTML() {
-  return `<button class="gear" id="gear" aria-label="Для взрослых: удерживайте 3 секунды">
+  return `<button class="gear" id="gear" aria-label="${esc(T('gearLabel'))}">
     <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22"/></svg>⚙️</button>`;
 }
 function rewardHTML() {
@@ -273,49 +486,50 @@ function rewardHTML() {
   if (!rw.on) return '';
   const got = rw.stars >= rw.goal, p = Math.min(100, rw.stars / rw.goal * 100);
   return `<footer class="reward ${got ? 'got' : ''}"><span style="font-size:28px">🎁</span>
-    <div class="rw"><div>${got ? 'Награда заработана! Скажи взрослому' : esc(rw.text)}</div>
+    <div class="rw"><div>${got ? esc(T('rewardGot')) : esc(rewardText())}</div>
     <div class="bar"><i style="width:${p}%"></i></div></div>
     <div>${Math.min(rw.stars, rw.goal)}/${rw.goal}⭐</div></footer>`;
 }
 
 function renderChild() {
   view = 'child';
+  document.title = T('appName');
   const h = hist(), run = validRun(), r = run && routine(run.rid);
   let body;
   if (state.finished) {
     const f = state.finished;
-    body = `<div class="big-emoji">🎉</div><h1>Молодец!</h1>
-      <p>«${esc(f.name)}» — всё сделано</p>
+    body = `<div class="big-emoji">🎉</div><h1>${esc(T('wellDone'))}</h1>
+      <p>${T('allDone', { name: esc(f.name) })}</p>
       <div class="stars-row">${'⭐'.repeat(Math.min(f.stars, 12))}</div>
-      <button class="btn-main" onclick="A.closeFinish()">Ура!</button>`;
+      <button class="btn-main" onclick="A.closeFinish()">${esc(T('hooray'))}</button>`;
   } else if (r) {
     const t = r.tasks[run.idx], nx = r.tasks[run.idx + 1];
-    body = `<div class="now-label">Сейчас</div>
+    body = `<div class="now-label">${esc(T('now'))}</div>
       <div class="task-icon">${t.icon}</div>
-      <h1 class="task-name">${esc(t.name)}</h1>
+      <h1 class="task-name">${esc(tname(t))}</h1>
       <div class="timer" id="timer"><svg viewBox="0 0 100 100" aria-hidden="true">
         <circle class="t-bg" cx="50" cy="50" r="48"/>
         <circle class="t-pie" id="pie" cx="50" cy="50" r="24" transform="rotate(-90 50 50)" stroke-dasharray="0 151"/>
       </svg></div>
       <div class="t-text" aria-live="polite"><b id="tBig"></b><span id="tSmall"></span></div>
-      <button class="btn-main" onclick="A.done()">✓ Готово</button>
-      <div class="next">${nx ? `Дальше: <span>${nx.icon} ${esc(nx.name)}</span>` : 'Это последнее дело! 💪'}</div>
+      <button class="btn-main" onclick="A.done()">${esc(T('done'))}</button>
+      <div class="next">${nx ? `${esc(T('next'))}: <span>${nx.icon} ${esc(tname(nx))}</span>` : esc(T('last'))}</div>
       <div class="dots">${r.tasks.map((x, i) => `<i class="${i < run.idx ? 'on' : i === run.idx ? 'cur' : ''}"></i>`).join('')}</div>`;
   } else {
-    const dow = new Date().getDay(), m = minsNow();
+    const dow = dowNow(), m = minsNow();
     const list = state.routines.filter(x => x.days.includes(dow) && x.tasks.length).sort((a, b) => hm(a.start) - hm(b.start));
     const nextR = list.find(x => hm(x.start) > m && !h.done[x.id]);
-    body = `<div class="big-emoji">🎈</div><h1>Свободное время</h1>
-      <p class="muted">${nextR ? `В ${nextR.start} — «${esc(nextR.name)}»` : 'Можно отдыхать'}</p>
+    body = `<div class="big-emoji">🎈</div><h1>${esc(T('free'))}</h1>
+      <p class="muted">${nextR ? T('atTime', { t: nextR.start, name: esc(rname(nextR)) }) : esc(T('relax'))}</p>
       ${list.length ? `<div class="today">${list.map(x => `
         <button class="r-chip ${h.done[x.id] ? 'ok' : ''}" ${h.done[x.id] ? 'disabled' : ''} onclick="A.start('${x.id}')">
-          <span>${x.tasks[0].icon}</span><b>${esc(x.name)}</b><small>${h.done[x.id] ? '✓ готово' : x.start}</small>
+          <span>${x.tasks[0].icon}</span><b>${esc(rname(x))}</b><small>${h.done[x.id] ? esc(T('doneMark')) : x.start}</small>
         </button>`).join('')}</div>
-        <div class="hint">Можно начать раньше — нажми на карточку</div>`
-      : `<p class="hint">На сегодня распорядков нет. Взрослый может добавить их в настройках ⚙️</p>`}`;
+        <div class="hint">${esc(T('startEarly'))}</div>`
+      : `<p class="hint">${esc(T('noRoutinesChild'))}</p>`}`;
   }
-  app.innerHTML = `<header class="top"><div class="who">${r ? esc(r.name) : 'Часик'}</div>
-    <div class="stars" title="Звёзды за сегодня">⭐ ${h.stars}</div>${gearHTML()}</header>
+  app.innerHTML = `<header class="top"><div class="who">${r ? esc(rname(r)) : esc(T('appName'))}</div>
+    <div class="stars" title="${esc(T('starsToday'))}">⭐ ${h.stars}</div>${gearHTML()}</header>
     <main class="child">${body}</main>${rewardHTML()}`;
   bindGear();
   updateTimer();
@@ -332,12 +546,12 @@ function updateTimer() {
   const big = $('#tBig'), small = $('#tSmall');
   if (left > 0) {
     const s = Math.ceil(left / 1000);
-    big.textContent = s >= 60 ? `${Math.ceil(s / 60)} мин` : `${s} сек`;
-    small.textContent = 'осталось';
+    big.textContent = s >= 60 ? `${Math.ceil(s / 60)} ${T('min')}` : `${s} ${T('sec')}`;
+    small.textContent = T('left');
   } else {
     const over = Math.floor(-left / 60000);
-    big.textContent = 'Время вышло';
-    small.textContent = over > 0 ? `+${over} мин · заканчивай и жми «Готово»` : 'заканчивай и жми «Готово»';
+    big.textContent = T('timeUp');
+    small.textContent = over > 0 ? `+${over} ${T('min')} · ${T('finishUp')}` : T('finishUp');
     if (!run.alerted) { run.alerted = true; save(); chime(); }
   }
 }
@@ -350,14 +564,14 @@ function bindGear() {
     e.preventDefault(); t0 = Date.now(); g.classList.add('hold');
     t = setTimeout(() => { cancel(); A.gate(); }, 3000);
   });
-  g.addEventListener('pointerup', () => { if (t && Date.now() - t0 < 2500) toast('Для взрослых: удерживайте ⚙️ 3 секунды'); cancel(); });
+  g.addEventListener('pointerup', () => { if (t && Date.now() - t0 < 2500) toast(T('gearToast')); cancel(); });
   g.addEventListener('pointerleave', cancel);
   g.addEventListener('pointercancel', cancel);
   g.addEventListener('contextmenu', e => e.preventDefault());
   g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); A.gate(); } });
 }
 
-/* ---------- окна ---------- */
+/* ---------- вікна ---------- */
 function modal(html) {
   closeModal();
   const bg = document.createElement('div'); bg.className = 'modal-bg'; bg.id = 'modal';
@@ -368,19 +582,19 @@ function modal(html) {
 function closeModal() { const m = $('#modal'); if (m) m.remove(); }
 let gateAns = 0;
 function confirmBox(text, okLabel, fn) {
-  modal(`<h2>${text}</h2><div class="row end"><button class="btn" onclick="A.closeModal()">Отмена</button>
-    <button class="btn primary" id="okBtn">${okLabel}</button></div>`);
+  modal(`<h2>${text}</h2><div class="row end"><button class="btn" onclick="A.closeModal()">${esc(T('cancel'))}</button>
+    <button class="btn primary" id="okBtn">${esc(okLabel)}</button></div>`);
   $('#okBtn').onclick = () => { closeModal(); fn(); };
 }
 
-/* ---------- режим взрослого ---------- */
+/* ---------- режим дорослого ---------- */
 function daysLabel(d) {
   const s = [...d].sort().join();
-  if (s === '0,1,2,3,4,5,6') return 'каждый день';
-  if (s === '1,2,3,4,5') return 'будни';
-  if (s === '0,6') return 'выходные';
-  if (!d.length) return 'дни не выбраны';
-  return DOW.filter(([n]) => d.includes(n)).map(([, l]) => l).join(', ');
+  if (s === '0,1,2,3,4,5,6') return T('everyDay');
+  if (s === '1,2,3,4,5') return T('weekdays');
+  if (s === '0,6') return T('weekend');
+  if (!d.length) return T('noDays');
+  return DOW_ORDER.filter(n => d.includes(n)).map(n => T('dow')[n]).join(', ');
 }
 
 function renderParent() {
@@ -390,61 +604,60 @@ function renderParent() {
   else if (pTab === 'routines') content = routinesHTML();
   else if (pTab === 'stats') content = statsHTML();
   else if (pTab === 'reward') content = rewardTabHTML();
-  else content = moreHTML();
-  const tabs = [['routines','Распорядки'],['stats','Итоги'],['reward','Награда'],['more','Ещё']];
-  app.innerHTML = `<header class="top"><div class="who">Режим взрослого</div>
-      <button class="btn-sm primary" onclick="A.exitParent()">К ребёнку →</button></header>
-    ${draft ? '' : `<nav class="tabs">${tabs.map(([k, l]) => `<button class="${pTab === k ? 'on' : ''}" onclick="A.tab('${k}')">${l}</button>`).join('')}</nav>`}
+  else content = settingsHTML();
+  const tabs = [['routines','tabRoutines'],['stats','tabStats'],['reward','tabReward'],['settings','tabSettings']];
+  app.innerHTML = `<header class="top"><div class="who">${esc(T('parentMode'))}</div>
+      <button class="btn-sm primary" onclick="A.exitParent()">${esc(T('toChild'))}</button></header>
+    ${draft ? '' : `<nav class="tabs">${tabs.map(([k, l]) => `<button class="${pTab === k ? 'on' : ''}" onclick="A.tab('${k}')">${esc(T(l))}</button>`).join('')}</nav>`}
     <main class="parent">${content}</main>`;
 }
 
 function routinesHTML() {
   const list = [...state.routines].sort((a, b) => hm(a.start) - hm(b.start));
   return `${list.length ? list.map(r => `<div class="card">
-      <div class="r-head"><div><b>${esc(r.name)}</b>
-        <div class="muted">${r.start} · ${daysLabel(r.days)} · ${r.tasks.length} дел · ${total(r)} мин</div></div>
-        <button class="btn-sm" onclick="A.edit('${r.id}')">Изменить</button></div>
+      <div class="r-head"><div><b>${esc(rname(r))}</b>
+        <div class="muted">${r.start} · ${esc(daysLabel(r.days))} · ${r.tasks.length} ${esc(plural(r.tasks.length, 'tasksN'))} · ${total(r)} ${esc(T('min'))}</div></div>
+        <button class="btn-sm" onclick="A.edit('${r.id}')">${esc(T('edit'))}</button></div>
       <div class="r-icons">${r.tasks.map(t => t.icon).join(' ')}</div></div>`).join('')
-    : '<p class="muted">Пока нет распорядков. Добавьте свой или возьмите шаблон.</p>'}
-    <button class="btn primary" onclick="A.edit()">+ Новый распорядок</button>
-    <h3>Шаблоны</h3>
-    <div class="row">${TEMPLATES.map((t, i) => `<button class="btn" onclick="A.fromTpl(${i})">+ ${esc(t.name)}</button>`).join('')}</div>
-    <p class="small muted">Распорядок включается сам в указанное время и идёт, пока ребёнок не закончит (или ещё час после планового конца).</p>`;
+    : `<p class="muted">${esc(T('noRoutines'))}</p>`}
+    <button class="btn primary" onclick="A.edit()">${esc(T('newRoutine'))}</button>
+    <h3>${esc(T('templates'))}</h3>
+    <div class="row">${TEMPLATES.map((t, i) => `<button class="btn" onclick="A.fromTpl(${i})">+ ${esc(T('t.' + t.tk))}</button>`).join('')}</div>
+    <p class="small muted">${esc(T('autoNote'))}</p>`;
 }
 
 function editorHTML() {
   const d = draft;
   return `<div class="card">
-      <label>Название<input type="text" value="${esc(d.name)}" maxlength="40" oninput="A.dset('name',this.value)"></label>
-      <label>Начало<input type="time" value="${d.start}" onchange="A.dset('start',this.value)"></label>
-      <div class="days">${DOW.map(([n, l]) => `<button class="day ${d.days.includes(n) ? 'on' : ''}" onclick="A.dday(${n})" aria-pressed="${d.days.includes(n)}">${l}</button>`).join('')}</div>
+      <label>${esc(T('name'))}<input type="text" value="${esc(rname(d))}" maxlength="40" oninput="A.dname(this.value)"></label>
+      <label>${esc(T('start'))}<input type="time" value="${d.start}" onchange="A.dset('start',this.value)"></label>
+      <div class="days">${DOW_ORDER.map(n => `<button class="day ${d.days.includes(n) ? 'on' : ''}" onclick="A.dday(${n})" aria-pressed="${d.days.includes(n)}">${esc(T('dow')[n])}</button>`).join('')}</div>
     </div>
-    <h3>Дела <span class="muted">· всего ${total(d)} мин</span></h3>
+    <h3>${esc(T('tasks'))} <span class="muted">· ${esc(T('total', { n: total(d) }))}</span></h3>
     ${d.tasks.map((t, i) => `<div class="card t-row">
-      <button class="ico" onclick="A.pick(${i})" aria-label="Сменить картинку">${t.icon}</button>
-      <input type="text" value="${esc(t.name)}" maxlength="40" oninput="A.tset(${i},this.value)" aria-label="Название дела">
+      <button class="ico" onclick="A.pick(${i})" aria-label="${esc(T('changeIcon'))}">${t.icon}</button>
+      <input type="text" value="${esc(tname(t))}" maxlength="40" oninput="A.tset(${i},this.value)" aria-label="${esc(T('taskName'))}">
       <div class="t-bottom">
-        <div class="step"><button onclick="A.tmin(${i},-1)" aria-label="Меньше">−</button><b>${t.min}</b><small>мин</small><button onclick="A.tmin(${i},1)" aria-label="Больше">+</button></div>
-        <div class="t-tools"><button onclick="A.tmove(${i},-1)" ${i ? '' : 'disabled'} aria-label="Выше">↑</button><button onclick="A.tmove(${i},1)" ${i < d.tasks.length - 1 ? '' : 'disabled'} aria-label="Ниже">↓</button><button onclick="A.tdel(${i})" aria-label="Удалить">✕</button></div>
+        <div class="step"><button onclick="A.tmin(${i},-1)" aria-label="${esc(T('less'))}">−</button><b>${t.min}</b><small>${esc(T('min'))}</small><button onclick="A.tmin(${i},1)" aria-label="${esc(T('more'))}">+</button></div>
+        <div class="t-tools"><button onclick="A.tmove(${i},-1)" ${i ? '' : 'disabled'} aria-label="${esc(T('up'))}">↑</button><button onclick="A.tmove(${i},1)" ${i < d.tasks.length - 1 ? '' : 'disabled'} aria-label="${esc(T('down'))}">↓</button><button onclick="A.tdel(${i})" aria-label="${esc(T('del'))}">✕</button></div>
       </div></div>`).join('')}
-    <button class="btn" onclick="A.tadd()">+ Добавить дело</button>
+    <button class="btn" onclick="A.tadd()">${esc(T('addTask'))}</button>
     <div class="row end" style="margin-top:8px">
-      ${d.isNew ? '' : '<button class="btn danger" onclick="A.rdel()">Удалить</button>'}
+      ${d.isNew ? '' : `<button class="btn danger" onclick="A.rdel()">${esc(T('del'))}</button>`}
       <span class="grow"></span>
-      <button class="btn" onclick="A.cancelEdit()">Отмена</button>
-      <button class="btn primary" onclick="A.save()">Сохранить</button></div>`;
+      <button class="btn" onclick="A.cancelEdit()">${esc(T('cancel'))}</button>
+      <button class="btn primary" onclick="A.save()">${esc(T('save'))}</button></div>`;
 }
 
 function statsHTML() {
   const rows = [];
   let maxStars = 1;
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 864e5), h = state.history[dayKey(d)];
+    const ms = Date.now() - i * 864e5, z = zp(ms), h = state.history[dayKey(ms)];
     const st = h ? h.stars : 0, late = h ? h.tasks.filter(t => t.late).length : 0;
     maxStars = Math.max(maxStars, st);
-    rows.push({ label: i === 0 ? 'Сегодня' : `${WD[d.getDay()]} ${d.getDate()}`, st, late });
+    rows.push({ label: i === 0 ? T('today') : `${T('dow')[z.dow]} ${z.d}`, st, late });
   }
-  // где не хватает времени
   const agg = {};
   for (const h of Object.values(state.history)) for (const t of h.tasks) {
     const k = t.icon + ' ' + t.name;
@@ -454,58 +667,78 @@ function statsHTML() {
   const hard = Object.entries(agg).filter(([, a]) => a.n >= 2 && a.late / a.n >= 0.5)
     .sort((x, y) => y[1].late / y[1].n - x[1].late / x[1].n).slice(0, 5);
   const any = Object.keys(agg).length;
-  return `<div class="card"><b>Звёзды за неделю</b>
-    ${rows.map(r => `<div class="stat-row"><span>${r.label}</span><div class="bar"><i style="width:${r.st / maxStars * 100}%"></i></div>
+  return `<div class="card"><b>${esc(T('weekStars'))}</b>
+    ${rows.map(r => `<div class="stat-row"><span>${esc(r.label)}</span><div class="bar"><i style="width:${r.st / maxStars * 100}%"></i></div>
       <span>⭐ ${r.st}${r.late ? ` <span class="muted">· ⏰${r.late}</span>` : ''}</span></div>`).join('')}
-    <p class="small muted">⏰ — сколько дел заняли больше времени, чем запланировано.</p></div>
-    <div class="card"><b>Где не хватает времени</b>
-    ${!any ? '<p class="tip muted">Данных пока нет — они появятся после первых выполненных дел.</p>'
-      : hard.length ? hard.map(([k, a]) => `<p class="tip"><b>${esc(k)}</b> — не успевает ${a.late} из ${a.n} раз, в среднем ${Math.round(a.sum / a.n)} мин вместо ${a.plan}. Попробуйте дать ${Math.ceil(a.sum / a.n)} мин.</p>`).join('')
-      : '<p class="tip">Пока всё успевается 👍</p>'}</div>`;
+    <p class="small muted">${esc(T('lateNote'))}</p></div>
+    <div class="card"><b>${esc(T('hardTitle'))}</b>
+    ${!any ? `<p class="tip muted">${esc(T('noData'))}</p>`
+      : hard.length ? hard.map(([k, a]) => `<p class="tip"><b>${esc(k)}</b> ${esc(T('hardLine', { late: a.late, n: a.n, avg: Math.round(a.sum / a.n), plan: a.plan, sug: Math.ceil(a.sum / a.n) }))}</p>`).join('')
+      : `<p class="tip">${esc(T('allGood'))}</p>`}</div>`;
 }
 
 function rewardTabHTML() {
   const rw = state.reward, got = rw.stars >= rw.goal;
   return `<div class="card">
-      <label class="switch">Копить звёзды на награду<input type="checkbox" ${rw.on ? 'checked' : ''} onchange="A.rset('on',this.checked)"></label>
-      <label>Награда<input type="text" value="${esc(rw.text)}" maxlength="60" oninput="A.rset('text',this.value)"></label>
-      <div class="t-bottom"><span style="font-weight:700">Сколько звёзд нужно</span>
+      <label class="switch">${esc(T('rewardOn'))}<input type="checkbox" ${rw.on ? 'checked' : ''} onchange="A.rset('on',this.checked)"></label>
+      <label>${esc(T('rewardName'))}<input type="text" value="${esc(rewardText())}" maxlength="60" oninput="A.rset('text',this.value)"></label>
+      <div class="t-bottom"><span style="font-weight:700">${esc(T('starsNeeded'))}</span>
         <div class="step"><button onclick="A.rgoal(-5)">−</button><b>${rw.goal}</b><small>⭐</small><button onclick="A.rgoal(5)">+</button></div></div>
     </div>
-    <div class="card"><b>Сейчас: ${rw.stars} из ${rw.goal} ⭐</b>
+    <div class="card"><b>${esc(T('nowOf', { a: rw.stars, b: rw.goal }))}</b>
       <div class="bar"><i style="width:${Math.min(100, rw.stars / rw.goal * 100)}%"></i></div>
-      ${got ? `<button class="btn primary" onclick="A.rgive()">Награда выдана — копим заново</button>` : '<p class="small muted">Звезда даётся за каждое сделанное дело. Звёзды не отнимаются.</p>'}
+      ${got ? `<button class="btn primary" onclick="A.rgive()">${esc(T('rewardGiven'))}</button>` : `<p class="small muted">${esc(T('rewardNote'))}</p>`}
     </div>`;
 }
 
-function moreHTML() {
-  const run = validRun();
+function settingsHTML() {
+  const run = validRun(), cur = state.settings.tz;
+  let all = [];
+  try { all = Intl.supportedValuesOf('timeZone'); } catch (e) {}
+  const pop = POPULAR_TZ.filter(validTz).filter((z, i, a) => !(z === 'Europe/Kiev' && a.includes('Europe/Kyiv')));
+  if (cur !== 'auto' && !pop.includes(cur) && !all.includes(cur)) pop.unshift(cur);
+  const opt = z => `<option value="${esc(z)}" ${z === cur ? 'selected' : ''}>${esc(z === 'auto' ? T('tzAuto') : tzLabel(z))}</option>`;
+  const z = zp();
   return `<div class="card">
-      <label class="switch">Звук, когда время вышло<input type="checkbox" ${state.sound ? 'checked' : ''} onchange="A.sound(this.checked)"></label>
+      <label>${esc(T('language'))}<select onchange="A.setLang(this.value)">
+        ${LANGS.map(l => `<option value="${l}" ${l === lang ? 'selected' : ''}>${esc(DICT[l].langName)}</option>`).join('')}
+      </select></label>
     </div>
-    ${run ? `<div class="card"><b>Идёт: «${esc(routine(run.rid).name)}»</b>
-      <div class="row"><button class="btn" onclick="A.skipTask()">Пропустить текущее дело</button><button class="btn" onclick="A.stopRun()">Остановить</button></div></div>` : ''}
-    <div class="card"><b>Как поставить на телефон или планшет</b>
-      <p class="small">Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «Часик» работает без интернета.</p>
-      <p class="small muted">Все данные хранятся только на этом устройстве.</p></div>
-    <button class="btn danger" onclick="A.reset()">Сбросить все данные</button>`;
+    <div class="card">
+      <label>${esc(T('timezone'))}<select onchange="A.setTz(this.value)">
+        ${opt('auto')}
+        <optgroup label="${esc(T('tzPopular'))}">${pop.map(opt).join('')}</optgroup>
+        ${all.length ? `<optgroup label="${esc(T('tzAll'))}">${all.filter(x => !pop.includes(x)).map(x => `<option value="${esc(x)}" ${x === cur ? 'selected' : ''}>${esc(x.replace(/_/g, ' '))}</option>`).join('')}</optgroup>` : ''}
+      </select></label>
+      <div class="tz-now">${esc(T('tzNow', { t: `${pad(z.h)}:${pad(z.min)}, ${T('dow')[z.dow]} ${z.d}.${pad(z.m)}` }))}</div>
+      <p class="small muted">${esc(T('tzNote'))}</p>
+    </div>
+    <div class="card">
+      <label class="switch">${esc(T('sound'))}<input type="checkbox" ${state.sound ? 'checked' : ''} onchange="A.sound(this.checked)"></label>
+    </div>
+    ${run ? `<div class="card"><b>${esc(T('running', { name: rname(routine(run.rid)) }))}</b>
+      <div class="row"><button class="btn" onclick="A.skipTask()">${esc(T('skip'))}</button><button class="btn" onclick="A.stopRun()">${esc(T('stop'))}</button></div></div>` : ''}
+    <div class="card"><b>${esc(T('installTitle'))}</b>
+      <p class="small">${esc(T('installText'))}</p>
+      <p class="small muted">${esc(T('privacy'))}</p></div>
+    <button class="btn danger" onclick="A.reset()">${esc(T('resetAll'))}</button>`;
 }
 
-/* ---------- действия ---------- */
+/* ---------- дії ---------- */
 const A = {
   done() {
     const run = validRun(); if (!run) return renderChild();
-    if (Date.now() - lastDone < 900) return; // защита от двойного нажатия
+    if (Date.now() - lastDone < 900) return; // захист від подвійного натискання
     lastDone = Date.now(); unlockAudio();
     const r = routine(run.rid), t = r.tasks[run.idx], h = hist();
     const actual = (Date.now() - run.t0) / 60000;
-    h.tasks.push({ icon: t.icon, name: t.name, plan: t.min, actual: Math.round(actual * 10) / 10, late: actual > t.min });
+    h.tasks.push({ icon: t.icon, name: tname(t), plan: t.min, actual: Math.round(actual * 10) / 10, late: actual > t.min });
     h.stars++;
     if (state.reward.on) state.reward.stars++;
     run.idx++;
     if (run.idx >= r.tasks.length) {
       h.done[r.id] = true;
-      state.finished = { name: r.name, stars: r.tasks.length };
+      state.finished = { name: rname(r), stars: r.tasks.length };
       state.run = null;
     } else { run.t0 = Date.now(); run.alerted = false; }
     save(); flyStar();
@@ -516,10 +749,10 @@ const A = {
   closeFinish() { state.finished = null; save(); renderChild(); },
   gate() {
     const a = 12 + rand(8), b = 3 + rand(7); gateAns = a * b;
-    modal(`<h2>Для взрослых</h2><div class="q">${a} × ${b} = ?</div>
-      <input id="gateIn" inputmode="numeric" autocomplete="off" aria-label="Ответ">
-      <div class="row end"><button class="btn" onclick="A.closeModal()">Отмена</button>
-      <button class="btn primary" onclick="A.checkGate()">Войти</button></div>`);
+    modal(`<h2>${esc(T('forAdults'))}</h2><div class="q">${a} × ${b} = ?</div>
+      <input id="gateIn" inputmode="numeric" autocomplete="off" aria-label="${esc(T('answer'))}">
+      <div class="row end"><button class="btn" onclick="A.closeModal()">${esc(T('cancel'))}</button>
+      <button class="btn primary" onclick="A.checkGate()">${esc(T('enter'))}</button></div>`);
     const i = $('#gateIn'); i.focus();
     i.addEventListener('keydown', e => { if (e.key === 'Enter') A.checkGate(); });
   },
@@ -530,20 +763,21 @@ const A = {
   },
   closeModal,
   exitParent() {
-    if (draft) return confirmBox('Выйти без сохранения изменений?', 'Выйти', () => { draft = null; renderChild(); });
+    if (draft) return confirmBox(esc(T('leaveUnsaved')), T('leave'), () => { draft = null; renderChild(); });
     renderChild();
   },
   tab(k) { pTab = k; renderParent(); },
   edit(id) {
     const r = id && routine(id);
     draft = r ? JSON.parse(JSON.stringify(r))
-      : { id: uid(), name: 'Новый распорядок', start: '08:00', days: [1,2,3,4,5], tasks: [{ icon: '⏰', name: 'Первое дело', min: 5 }], isNew: true };
+      : { id: uid(), name: T('newRoutineName'), start: '08:00', days: [1,2,3,4,5], tasks: [{ icon: '⏰', name: T('firstTask'), min: 5 }], isNew: true };
     renderParent(); window.scrollTo(0, 0);
   },
   fromTpl(i) { draft = { ...fromTemplate(TEMPLATES[i]), isNew: true }; renderParent(); window.scrollTo(0, 0); },
   dset(k, v) { draft[k] = v; },
+  dname(v) { draft.name = v; delete draft.tk; },
   dday(n) { const d = draft.days; const i = d.indexOf(n); i >= 0 ? d.splice(i, 1) : d.push(n); renderParent(); },
-  tset(i, v) { draft.tasks[i].name = v; },
+  tset(i, v) { draft.tasks[i].name = v; delete draft.tasks[i].tk; },
   tmin(i, dir) {
     const t = draft.tasks[i];
     t.min = dir > 0 ? (t.min < 10 ? t.min + 1 : t.min + 5) : (t.min <= 10 ? t.min - 1 : t.min - 5);
@@ -553,53 +787,56 @@ const A = {
   tdel(i) { draft.tasks.splice(i, 1); renderParent(); },
   tadd() { draft.tasks.push({ icon: '⏰', name: '', min: 5 }); renderParent(); const ins = document.querySelectorAll('.t-row input'); ins[ins.length - 1]?.focus(); },
   pick(i) {
-    modal(`<h2>Картинка</h2><div class="emoji-grid">${ICONS.map(e => `<button onclick="A.setIcon(${i},'${e}')">${e}</button>`).join('')}</div>
-      <button class="btn" onclick="A.closeModal()">Отмена</button>`);
+    modal(`<h2>${esc(T('picture'))}</h2><div class="emoji-grid">${ICONS.map(e => `<button onclick="A.setIcon(${i},'${e}')">${e}</button>`).join('')}</div>
+      <button class="btn" onclick="A.closeModal()">${esc(T('cancel'))}</button>`);
   },
   setIcon(i, e) { draft.tasks[i].icon = e; closeModal(); renderParent(); },
   cancelEdit() { draft = null; renderParent(); },
   save() {
     const d = draft;
-    d.name = d.name.trim() || 'Распорядок';
-    d.tasks = d.tasks.map(t => ({ ...t, name: t.name.trim() })).filter(t => t.name);
-    if (!d.tasks.length) return toast('Добавьте хотя бы одно дело с названием');
-    if (!d.days.length) return toast('Выберите хотя бы один день');
+    if (!d.tk) d.name = d.name.trim() || T('routineDefault');
+    d.tasks = d.tasks.map(t => ({ ...t, name: (t.name || '').trim() })).filter(t => t.tk || t.name);
+    if (!d.tasks.length) return toast(T('needTask'));
+    if (!d.days.length) return toast(T('needDay'));
     delete d.isNew;
     const i = state.routines.findIndex(r => r.id === d.id);
     i >= 0 ? (state.routines[i] = d) : state.routines.push(d);
-    draft = null; save(); validRun(); renderParent(); toast('Сохранено');
+    draft = null; save(); validRun(); renderParent(); toast(T('saved'));
   },
   rdel() {
-    confirmBox(`Удалить «${esc(draft.name)}»?`, 'Удалить', () => {
+    confirmBox(T('confirmDel', { name: esc(rname(draft)) }), T('del'), () => {
       state.routines = state.routines.filter(r => r.id !== draft.id);
       draft = null; save(); validRun(); renderParent();
     });
   },
   rset(k, v) { state.reward[k] = v; save(); if (k === 'on') renderParent(); },
   rgoal(d) { state.reward.goal = Math.max(5, Math.min(200, state.reward.goal + d)); save(); renderParent(); },
-  rgive() { state.reward.stars = Math.max(0, state.reward.stars - state.reward.goal); save(); renderParent(); toast('Копим на следующую награду'); },
+  rgive() { state.reward.stars = Math.max(0, state.reward.stars - state.reward.goal); save(); renderParent(); toast(T('nextReward')); },
+  setLang(l) { if (!LANGS.includes(l)) return; lang = state.settings.lang = l; document.documentElement.lang = l; save(); renderParent(); },
+  setTz(z) { state.settings.tz = (z === 'auto' || validTz(z)) ? z : 'auto'; save(); validRun(); renderParent(); },
   sound(v) { state.sound = v; save(); if (v) { unlockAudio(); chime(); } },
   skipTask() {
     const run = validRun(); if (!run) return;
     const r = routine(run.rid); run.idx++; run.t0 = Date.now(); run.alerted = false;
     if (run.idx >= r.tasks.length) { hist().done[r.id] = true; state.run = null; }
-    save(); renderParent(); toast('Дело пропущено');
+    save(); renderParent(); toast(T('skipped'));
   },
   stopRun() {
     const run = validRun(); if (!run) return;
-    hist().done[run.rid] = true; // чтобы не запустился снова сегодня
-    state.run = null; save(); renderParent(); toast('Распорядок остановлен');
+    hist().done[run.rid] = true; // щоб не запустився знову сьогодні
+    state.run = null; save(); renderParent(); toast(T('stopped'));
   },
   reset() {
-    confirmBox('Удалить все распорядки, звёзды и историю? Это нельзя отменить.', 'Удалить всё', () => {
+    confirmBox(esc(T('resetConfirm')), T('resetBtn'), () => {
+      const keep = { ...state.settings };
       try { localStorage.removeItem(KEY); } catch (e) {}
-      load(); save(); draft = null; renderParent(); toast('Данные сброшены');
+      load(); state.settings = keep; lang = keep.lang; save(); draft = null; renderParent(); toast(T('resetDone'));
     });
   },
 };
 window.A = A;
 
-/* ---------- основной цикл ---------- */
+/* ---------- основний цикл ---------- */
 function tick() {
   if (!validRun()) {
     const r = autoRoutine();

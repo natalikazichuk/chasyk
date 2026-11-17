@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CHASIC</title>
+<title>CHASIK</title>
 <meta name="description" content="Простий трекер часу для дитини: справа, круг, що тане, і кнопка «Готово».">
 <meta name="theme-color" content="#5b8def">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -162,7 +162,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 <script>
 'use strict';
 /* =========================================================
-   CHASIC — трекер часу для дитини.
+   CHASIK — трекер часу для дитини.
    Мови: українська, англійська, російська.
    Усе зберігається в localStorage на цьому пристрої.
    ========================================================= */
@@ -178,7 +178,7 @@ const rand = n => Math.floor(Math.random() * n);
 /* ---------- переклади ---------- */
 const DICT = {
   uk: {
-    langName: 'Українська', appName: 'CHASIC',
+    langName: 'Українська', appName: 'CHASIK',
     now: 'Зараз', next: 'Далі', last: 'Це остання справа! 💪', done: '✓ Готово',
     min: 'хв', sec: 'с', left: 'залишилось', timeUp: 'Час вийшов', finishUp: 'закінчуй і тисни «Готово»',
     wellDone: 'Молодець!', allDone: '«{name}» — усе зроблено', hooray: 'Ура!', back: '↩️ Назад', againAsk: 'Почати «{name}» ще раз?', againYes: 'Почати',
@@ -214,7 +214,7 @@ const DICT = {
     sound: 'Звук, коли час вийшов', running: 'Триває: «{name}»', skip: 'Пропустити поточну справу', stop: 'Зупинити',
     skipped: 'Справу пропущено', stopped: 'Розпорядок зупинено',
     installTitle: 'Як поставити на телефон або планшет',
-    installText: 'Відкрийте сторінку в браузері. Android (Chrome): меню ⋮ → «Додати на головний екран». iPhone/iPad (Safari): «Поділитися» → «На початковий екран». Після цього «CHASIC» працює без інтернету.',
+    installText: 'Відкрийте сторінку в браузері. Android (Chrome): меню ⋮ → «Додати на головний екран». iPhone/iPad (Safari): «Поділитися» → «На початковий екран». Після цього «CHASIK» працює без інтернету.',
     privacy: 'Усі дані зберігаються лише на цьому пристрої.',
     resetAll: 'Скинути всі дані', resetConfirm: 'Видалити всі розпорядки, зірки й історію? Це не можна скасувати.',
     resetBtn: 'Видалити все', resetDone: 'Дані скинуто',
@@ -226,7 +226,7 @@ const DICT = {
     'k.pajamas': 'Піжама', 'k.book': 'Книжка', 'k.sleep': 'Спати', 'k.bed2': 'Застелити ліжко',
   },
   en: {
-    langName: 'English', appName: 'CHASIC',
+    langName: 'English', appName: 'CHASIK',
     now: 'Now', next: 'Next', last: 'Last one! 💪', done: '✓ Done',
     min: 'min', sec: 'sec', left: 'left', timeUp: 'Time’s up', finishUp: 'finish up and tap “Done”',
     wellDone: 'Well done!', allDone: '“{name}” — all done', hooray: 'Hooray!', back: '↩️ Back', againAsk: 'Start “{name}” again?', againYes: 'Start',
@@ -274,7 +274,7 @@ const DICT = {
     'k.pajamas': 'Pajamas', 'k.book': 'Book', 'k.sleep': 'Sleep', 'k.bed2': 'Make the bed',
   },
   ru: {
-    langName: 'Русский', appName: 'CHASIC',
+    langName: 'Русский', appName: 'CHASIK',
     now: 'Сейчас', next: 'Дальше', last: 'Это последнее дело! 💪', done: '✓ Готово',
     min: 'мин', sec: 'сек', left: 'осталось', timeUp: 'Время вышло', finishUp: 'заканчивай и жми «Готово»',
     wellDone: 'Молодец!', allDone: '«{name}» — всё сделано', hooray: 'Ура!', back: '↩️ Назад', againAsk: 'Начать «{name}» ещё раз?', againYes: 'Начать',
@@ -310,7 +310,7 @@ const DICT = {
     sound: 'Звук, когда время вышло', running: 'Идёт: «{name}»', skip: 'Пропустить текущее дело', stop: 'Остановить',
     skipped: 'Дело пропущено', stopped: 'Распорядок остановлен',
     installTitle: 'Как поставить на телефон или планшет',
-    installText: 'Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «CHASIC» работает без интернета.',
+    installText: 'Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «CHASIK» работает без интернета.',
     privacy: 'Все данные хранятся только на этом устройстве.',
     resetAll: 'Сбросить все данные', resetConfirm: 'Удалить все распорядки, звёзды и историю? Это нельзя отменить.',
     resetBtn: 'Удалить всё', resetDone: 'Данные сброшены',

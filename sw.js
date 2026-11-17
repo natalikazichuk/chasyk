@@ -1,4 +1,4 @@
-// CHASIC: офлайн-кэш. Сначала сеть (чтобы обновления приходили), без сети — кэш.
+// CHASIK: офлайн-кэш. Сначала сеть (чтобы обновления приходили), без сети — кэш.
 const CACHE = 'chasyk-v8';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 

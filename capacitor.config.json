@@ -1,6 +1,6 @@
 {
   "appId": "io.github.natalikazichuk.chasyk",
-  "appName": "CHASIC",
+  "appName": "CHASIK",
   "webDir": "www",
   "android": { "backgroundColor": "#fdf8f0" }
 }

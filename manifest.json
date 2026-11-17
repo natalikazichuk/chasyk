@@ -1,6 +1,6 @@
 {
-  "name": "CHASIC — трекер часу для дитини",
-  "short_name": "CHASIC",
+  "name": "CHASIK — трекер часу для дитини",
+  "short_name": "CHASIK",
   "description": "Простий трекер часу для дитини: справа, круг, що тане, і кнопка «Готово».",
   "start_url": "./",
   "scope": "./",

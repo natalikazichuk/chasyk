@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="uk">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -344,10 +344,8 @@ function plural(n, key) {
   try { r = new Intl.PluralRules(lang).select(n); } catch (e) {}
   return f[r] || f.other;
 }
-function detectLang() {
-  const l = (navigator.language || 'uk').toLowerCase();
-  return l.startsWith('ru') ? 'ru' : l.startsWith('en') ? 'en' : 'uk';
-}
+// Мова за замовчуванням — англійська (змінити: режим дорослого → Налаштування → Мова)
+function detectLang() { return 'en'; }
 
 /* ---------- часовий пояс ---------- */
 const WD_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];

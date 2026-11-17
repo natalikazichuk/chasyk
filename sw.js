@@ -1,6 +1,6 @@
-// Часик: офлайн-кэш. Сначала сеть (чтобы обновления приходили), без сети — кэш.
-const CACHE = 'chasyk-v7';
-const FILES = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
+// CHASIK: офлайн-кэш. Сначала сеть (чтобы обновления приходили), без сети — кэш.
+const CACHE = 'chasyk-v9';
+const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './img/m-wave.webp', './img/m-sleep.webp', './img/m-school.webp', './img/m-sport.webp'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));

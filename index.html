@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Часик</title>
+<title>CHASIK</title>
 <meta name="description" content="Простий трекер часу для дитини: справа, круг, що тане, і кнопка «Готово».">
 <meta name="theme-color" content="#5b8def">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 :root{
   --bg:#fdf8f0;--card:#ffffff;--ink:#2d2a32;--muted:#857f8f;--line:#ece4d8;--track:#efe7da;
@@ -73,6 +73,9 @@ input,select{font:inherit;color:inherit}
 .dots i.on{background:var(--green)}
 .dots i.cur{background:var(--accent);transform:scale(1.35)}
 .big-emoji{font-size:clamp(72px,22vw,110px);line-height:1.1}
+.mascot{display:block;margin:0 auto;height:clamp(150px,30vh,240px);width:auto;max-width:70vw;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(40,20,70,.18));animation:hop .6s ease-out}
+@keyframes hop{from{transform:translateY(14px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+.r-chip small em{display:block;font-style:normal;color:var(--accent);font-size:13px}
 .child h1{font-size:clamp(28px,8vw,40px);font-weight:900}
 .child p{font-size:18px}
 .today{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;margin-top:14px}
@@ -162,7 +165,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 <script>
 'use strict';
 /* =========================================================
-   Часик — трекер часу для дитини.
+   CHASIK — трекер часу для дитини.
    Мови: українська, англійська, російська.
    Усе зберігається в localStorage на цьому пристрої.
    ========================================================= */
@@ -178,10 +181,10 @@ const rand = n => Math.floor(Math.random() * n);
 /* ---------- переклади ---------- */
 const DICT = {
   uk: {
-    langName: 'Українська', appName: 'Часик',
+    langName: 'Українська', appName: 'CHASIK',
     now: 'Зараз', next: 'Далі', last: 'Це остання справа! 💪', done: '✓ Готово',
     min: 'хв', sec: 'с', left: 'залишилось', timeUp: 'Час вийшов', finishUp: 'закінчуй і тисни «Готово»',
-    wellDone: 'Молодець!', allDone: '«{name}» — усе зроблено', hooray: 'Ура!', back: '↩️ Назад', againAsk: 'Почати «{name}» ще раз?', againYes: 'Почати',
+    wellDone: 'Молодець!', allDone: '«{name}» — усе зроблено', hooray: 'Ура!', againShort: '↻ ще раз', back: '↩️ Назад', againAsk: 'Почати «{name}» ще раз?', againYes: 'Почати',
     free: 'Вільний час', atTime: 'О {t} — «{name}»', relax: 'Можна відпочивати', inTime: 'через {t}', hr: 'год', pause: '⏸️ Пауза', resume: '▶️ Продовжити', paused: 'Пауза', stopShort: '⏹️ Стоп', stopAsk: 'Зупинити «{name}»?', stopYes: 'Зупинити', clockTitle: 'Котра година',
     startEarly: 'Можна почати раніше — натисни на картку', noRoutinesChild: 'На сьогодні розпорядків немає. Дорослий може додати їх у налаштуваннях ⚙️',
     doneMark: '✓ готово', starsToday: 'Зірки за сьогодні', rewardGot: 'Нагороду зароблено! Скажи дорослому',
@@ -214,7 +217,7 @@ const DICT = {
     sound: 'Звук, коли час вийшов', running: 'Триває: «{name}»', skip: 'Пропустити поточну справу', stop: 'Зупинити',
     skipped: 'Справу пропущено', stopped: 'Розпорядок зупинено',
     installTitle: 'Як поставити на телефон або планшет',
-    installText: 'Відкрийте сторінку в браузері. Android (Chrome): меню ⋮ → «Додати на головний екран». iPhone/iPad (Safari): «Поділитися» → «На початковий екран». Після цього «Часик» працює без інтернету.',
+    installText: 'Відкрийте сторінку в браузері. Android (Chrome): меню ⋮ → «Додати на головний екран». iPhone/iPad (Safari): «Поділитися» → «На початковий екран». Після цього «CHASIK» працює без інтернету.',
     privacy: 'Усі дані зберігаються лише на цьому пристрої.',
     resetAll: 'Скинути всі дані', resetConfirm: 'Видалити всі розпорядки, зірки й історію? Це не можна скасувати.',
     resetBtn: 'Видалити все', resetDone: 'Дані скинуто',
@@ -226,10 +229,10 @@ const DICT = {
     'k.pajamas': 'Піжама', 'k.book': 'Книжка', 'k.sleep': 'Спати', 'k.bed2': 'Застелити ліжко',
   },
   en: {
-    langName: 'English', appName: 'Chasyk',
+    langName: 'English', appName: 'CHASIK',
     now: 'Now', next: 'Next', last: 'Last one! 💪', done: '✓ Done',
     min: 'min', sec: 'sec', left: 'left', timeUp: 'Time’s up', finishUp: 'finish up and tap “Done”',
-    wellDone: 'Well done!', allDone: '“{name}” — all done', hooray: 'Hooray!', back: '↩️ Back', againAsk: 'Start “{name}” again?', againYes: 'Start',
+    wellDone: 'Well done!', allDone: '“{name}” — all done', hooray: 'Hooray!', againShort: '↻ again', back: '↩️ Back', againAsk: 'Start “{name}” again?', againYes: 'Start',
     free: 'Free time', atTime: 'At {t} — “{name}”', relax: 'Time to relax', inTime: 'in {t}', hr: 'h', pause: '⏸️ Pause', resume: '▶️ Resume', paused: 'Paused', stopShort: '⏹️ Stop', stopAsk: 'Stop “{name}”?', stopYes: 'Stop', clockTitle: 'Current time',
     startEarly: 'You can start early — tap a card', noRoutinesChild: 'No routines today. A grown-up can add them in settings ⚙️',
     doneMark: '✓ done', starsToday: 'Stars today', rewardGot: 'Reward earned! Tell a grown-up',
@@ -274,10 +277,10 @@ const DICT = {
     'k.pajamas': 'Pajamas', 'k.book': 'Book', 'k.sleep': 'Sleep', 'k.bed2': 'Make the bed',
   },
   ru: {
-    langName: 'Русский', appName: 'Часик',
+    langName: 'Русский', appName: 'CHASIK',
     now: 'Сейчас', next: 'Дальше', last: 'Это последнее дело! 💪', done: '✓ Готово',
     min: 'мин', sec: 'сек', left: 'осталось', timeUp: 'Время вышло', finishUp: 'заканчивай и жми «Готово»',
-    wellDone: 'Молодец!', allDone: '«{name}» — всё сделано', hooray: 'Ура!', back: '↩️ Назад', againAsk: 'Начать «{name}» ещё раз?', againYes: 'Начать',
+    wellDone: 'Молодец!', allDone: '«{name}» — всё сделано', hooray: 'Ура!', againShort: '↻ ещё раз', back: '↩️ Назад', againAsk: 'Начать «{name}» ещё раз?', againYes: 'Начать',
     free: 'Свободное время', atTime: 'В {t} — «{name}»', relax: 'Можно отдыхать', inTime: 'через {t}', hr: 'ч', pause: '⏸️ Пауза', resume: '▶️ Продолжить', paused: 'Пауза', stopShort: '⏹️ Стоп', stopAsk: 'Остановить «{name}»?', stopYes: 'Остановить', clockTitle: 'Который час',
     startEarly: 'Можно начать раньше — нажми на карточку', noRoutinesChild: 'На сегодня распорядков нет. Взрослый может добавить их в настройках ⚙️',
     doneMark: '✓ готово', starsToday: 'Звёзды за сегодня', rewardGot: 'Награда заработана! Скажи взрослому',
@@ -310,7 +313,7 @@ const DICT = {
     sound: 'Звук, когда время вышло', running: 'Идёт: «{name}»', skip: 'Пропустить текущее дело', stop: 'Остановить',
     skipped: 'Дело пропущено', stopped: 'Распорядок остановлен',
     installTitle: 'Как поставить на телефон или планшет',
-    installText: 'Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «Часик» работает без интернета.',
+    installText: 'Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «CHASIK» работает без интернета.',
     privacy: 'Все данные хранятся только на этом устройстве.',
     resetAll: 'Сбросить все данные', resetConfirm: 'Удалить все распорядки, звёзды и историю? Это нельзя отменить.',
     resetBtn: 'Удалить всё', resetDone: 'Данные сброшены',
@@ -548,6 +551,15 @@ function rewardHTML() {
     <div>${Math.min(rw.stars, rw.goal)}/${rw.goal}⭐</div></footer>`;
 }
 
+// Персонаж CHASIK: ранок — з рюкзаком, вечір — у піжамі, вільний час — махає, «Молодець!» — клас
+function mascotImg(k) { return `<img class="mascot" src="img/m-${k}.webp" alt="" aria-hidden="true">`; }
+function finishMascot(f) {
+  const r = f.rid && routine(f.rid); if (!r) return 'sport';
+  const h = hm(r.start);
+  if (r.tk === 'evening' || h >= 17 * 60) return 'sleep';
+  if (r.tk === 'morning' || h < 11 * 60) return 'school';
+  return 'sport';
+}
 function renderChild() {
   view = 'child';
   document.title = T('appName');
@@ -556,7 +568,7 @@ function renderChild() {
   let body;
   if (state.finished) {
     const f = state.finished;
-    body = `<div class="big-emoji">🎉</div><h1>${esc(T('wellDone'))}</h1>
+    body = `${mascotImg(finishMascot(f))}<h1>${esc(T('wellDone'))}</h1>
       <p>${T('allDone', { name: esc(f.name) })}</p>
       <div class="stars-row">${'⭐'.repeat(Math.min(f.stars, 12))}</div>
       <button class="btn-main" onclick="A.closeFinish()">${esc(T('hooray'))}</button>
@@ -581,12 +593,12 @@ function renderChild() {
     const dow = dowNow(), m = minsNow();
     const list = state.routines.filter(x => x.days.includes(dow) && x.tasks.length).sort((a, b) => hm(a.start) - hm(b.start));
     const nextR = list.find(x => hm(x.start) > m && !h.done[x.id]);
-    body = `<div class="big-emoji">🎈</div><h1>${esc(T('free'))}</h1>
+    body = `${mascotImg(m >= 18 * 60 || m < 5 * 60 ? 'sleep' : 'wave')}<h1>${esc(T('free'))}</h1>
       <p class="muted">${nextR ? T('atTime', { t: nextR.start, name: esc(rname(nextR)) }) : esc(T('relax'))}</p>
       ${nextR ? `<div class="countdown" aria-live="polite">⏳ ${esc(inTime(hm(nextR.start) - m))}</div>` : ''}
       ${list.length ? `<div class="today">${list.map(x => `
         <button class="r-chip ${h.done[x.id] ? 'ok' : ''}" onclick="A.${h.done[x.id] ? 'again' : 'start'}('${x.id}')">
-          <span>${x.tasks[0].icon}</span><b>${esc(rname(x))}</b><small>${h.done[x.id] ? esc(T('doneMark')) : x.start}</small>
+          <span>${x.tasks[0].icon}</span><b>${esc(rname(x))}</b><small>${h.done[x.id] ? `${esc(T('doneMark'))}<em>${esc(T('againShort'))}</em>` : x.start}</small>
         </button>`).join('')}</div>
         <div class="hint">${esc(T('startEarly'))}</div>`
       : `<p class="hint">${esc(T('noRoutinesChild'))}</p>`}`;
@@ -804,7 +816,7 @@ const A = {
     run.idx++;
     if (run.idx >= r.tasks.length) {
       h.done[r.id] = true;
-      state.finished = { name: rname(r), stars: r.tasks.length, date: dayKey() };
+      state.finished = { name: rname(r), rid: r.id, stars: r.tasks.length, date: dayKey() };
       state.run = null;
     } else { run.t0 = Date.now(); run.alerted = false; }
     save(); flyStar();

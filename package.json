@@ -2,7 +2,7 @@
   "name": "chasyk",
   "version": "1.0.0",
   "private": true,
-  "description": "Часик — трекер часу для дитини (PWA + Android)",
+  "description": "CHASIK — трекер часу для дитини (PWA + Android)",
   "scripts": {
     "www": "node scripts/build-www.mjs",
     "sync": "npm run www && npx cap sync android"

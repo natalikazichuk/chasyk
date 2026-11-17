@@ -26,7 +26,7 @@ html,body{min-height:100%}
 body{background:var(--bg);color:var(--ink);font-family:"Segoe UI Rounded","Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font:inherit;color:inherit;cursor:pointer}
 input,select{font:inherit;color:inherit}
-#app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:10px 16px calc(16px + env(safe-area-inset-bottom))}
+#app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
 .muted{color:var(--muted)}
 
 /* ---------- верхня панель ---------- */
@@ -437,8 +437,18 @@ function chime() {
     });
   } catch (e) {}
 }
-let wl = null;
+// Android-застосунок (Capacitor): нативні плагіни замість браузерних API
+const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const plug = n => (NATIVE && window.Capacitor.Plugins && window.Capacitor.Plugins[n]) || null;
+let wl = null, nativeAwake = false;
 async function keepAwake(on) {
+  const ka = plug('KeepAwake');
+  if (ka) {
+    if (on === nativeAwake) return;
+    nativeAwake = on;
+    try { await (on ? ka.keepAwake() : ka.allowSleep()); } catch (e) {}
+    return;
+  }
   try {
     if (on && !wl && 'wakeLock' in navigator && document.visibilityState === 'visible') {
       wl = await navigator.wakeLock.request('screen');
@@ -740,8 +750,8 @@ function settingsHTML() {
     </div>
     ${run ? `<div class="card"><b>${esc(T('running', { name: rname(routine(run.rid)) }))}</b>
       <div class="row"><button class="btn" onclick="A.skipTask()">${esc(T('skip'))}</button><button class="btn" onclick="A.stopRun()">${esc(T('stop'))}</button></div></div>` : ''}
-    <div class="card"><b>${esc(T('installTitle'))}</b>
-      <p class="small">${esc(T('installText'))}</p>
+    <div class="card">${NATIVE ? '' : `<b>${esc(T('installTitle'))}</b>
+      <p class="small">${esc(T('installText'))}</p>`}
       <p class="small muted">${esc(T('privacy'))}</p></div>
     <button class="btn danger" onclick="A.reset()">${esc(T('resetAll'))}</button>`;
 }
@@ -881,7 +891,18 @@ document.addEventListener('pointerdown', unlockAudio, { once: true });
 load(); save(); renderChild();
 setInterval(tick, 1000); tick();
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+// Кнопка «Назад» на Android: закрити вікно → вийти з режиму дорослого → згорнути застосунок
+if (plug('App')) {
+  try {
+    plug('App').addListener('backButton', () => {
+      if ($('#modal')) return closeModal();
+      if (view === 'parent') return draft ? A.cancelEdit() : A.exitParent();
+      plug('App').minimizeApp();
+    });
+  } catch (e) {}
+}
+
+if (!NATIVE && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 </script>

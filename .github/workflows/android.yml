@@ -1,4 +1,4 @@
-# Збирає Android-застосунок «Часик» (APK).
+# Збирає Android-застосунок «Час і К°» (APK).
 # Кожна збірка — артефакт у вкладці Actions; при оновленні main — ще й реліз із файлом chasyk.apk.
 name: Android APK
 
@@ -51,7 +51,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: android-v1.0.${{ github.run_number }}
-          name: Часик для Android 1.0.${{ github.run_number }}
+          name: Час і К° для Android 1.0.${{ github.run_number }}
           make_latest: true
           files: chasyk.apk
           body: |

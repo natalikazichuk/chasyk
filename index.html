@@ -79,6 +79,10 @@ input,select{font:inherit;color:inherit}
 .child h1{font-size:clamp(28px,8vw,40px);font-weight:900}
 .child p{font-size:18px}
 .today{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;margin-top:14px}
+.r-wrap{display:flex;gap:8px;align-items:stretch}
+.r-wrap .r-chip{flex:1;min-width:0}
+.r-reset{flex:0 0 64px;border-radius:20px;border:2px solid var(--line);background:var(--card);color:var(--accent);font-size:30px;font-weight:900;line-height:1}
+.r-reset:active{transform:translateY(2px)}
 .r-chip{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:20px;border:2px solid var(--line);background:var(--card);text-align:left;min-height:64px}
 .r-chip span{font-size:30px}
 .r-chip b{flex:1;font-size:18px}
@@ -214,7 +218,7 @@ const DICT = {
     defaultReward: 'Вибрати мультик на вечір',
     language: 'Мова', timezone: 'Часовий пояс', tzAuto: 'Автоматично (як на телефоні)', tzPopular: 'Популярні', tzAll: 'Усі пояси',
     tzNow: 'Зараз за цим часом: {t}', tzNote: 'Розпорядки запускаються за часом цього поясу.',
-    sound: 'Звук, коли час вийшов', running: 'Триває: «{name}»', skip: 'Пропустити поточну справу', stop: 'Зупинити',
+    sound: 'Звук, коли час вийшов', remind: 'Сигнал, коли час починати розпорядок', remTitle: '⏰ Час: «{name}»', remBody: 'Починаємо! Перша справа: {task}', undone: '«{name}» — знову чекає свого часу', undoneAria: 'Скинути «готово»', running: 'Триває: «{name}»', skip: 'Пропустити поточну справу', stop: 'Зупинити',
     skipped: 'Справу пропущено', stopped: 'Розпорядок зупинено',
     installTitle: 'Як поставити на телефон або планшет',
     installText: 'Відкрийте сторінку в браузері. Android (Chrome): меню ⋮ → «Додати на головний екран». iPhone/iPad (Safari): «Поділитися» → «На початковий екран». Після цього «CHASIK» працює без інтернету.',
@@ -262,7 +266,7 @@ const DICT = {
     defaultReward: 'Pick a cartoon for tonight',
     language: 'Language', timezone: 'Time zone', tzAuto: 'Automatic (phone setting)', tzPopular: 'Popular', tzAll: 'All time zones',
     tzNow: 'Time there now: {t}', tzNote: 'Routines start by this zone’s time.',
-    sound: 'Sound when time is up', running: 'Running: “{name}”', skip: 'Skip current task', stop: 'Stop',
+    sound: 'Sound when time is up', remind: 'Signal when it’s time to start a routine', remTitle: '⏰ Time for “{name}”', remBody: 'Let’s start! First: {task}', undone: '“{name}” is waiting for its time again', undoneAria: 'Reset “done”', running: 'Running: “{name}”', skip: 'Skip current task', stop: 'Stop',
     skipped: 'Task skipped', stopped: 'Routine stopped',
     installTitle: 'How to put it on a phone or tablet',
     installText: 'Open the page in a browser. Android (Chrome): menu ⋮ → “Add to Home screen”. iPhone/iPad (Safari): Share → “Add to Home Screen”. After that it works offline.',
@@ -310,7 +314,7 @@ const DICT = {
     defaultReward: 'Выбрать мультик на вечер',
     language: 'Язык', timezone: 'Часовой пояс', tzAuto: 'Автоматически (как на телефоне)', tzPopular: 'Популярные', tzAll: 'Все пояса',
     tzNow: 'Сейчас по этому времени: {t}', tzNote: 'Распорядки запускаются по времени этого пояса.',
-    sound: 'Звук, когда время вышло', running: 'Идёт: «{name}»', skip: 'Пропустить текущее дело', stop: 'Остановить',
+    sound: 'Звук, когда время вышло', remind: 'Сигнал, когда пора начинать распорядок', remTitle: '⏰ Время: «{name}»', remBody: 'Начинаем! Первое дело: {task}', undone: '«{name}» — снова ждёт своего времени', undoneAria: 'Сбросить «готово»', running: 'Идёт: «{name}»', skip: 'Пропустить текущее дело', stop: 'Остановить',
     skipped: 'Дело пропущено', stopped: 'Распорядок остановлен',
     installTitle: 'Как поставить на телефон или планшет',
     installText: 'Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «CHASIK» работает без интернета.',
@@ -430,7 +434,55 @@ function load() {
   const cut = dayKey(Date.now() - 30 * 864e5);
   for (const k of Object.keys(state.history)) if (k < cut) delete state.history[k];
 }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} planReminders(); }
+
+/* ---------- сповіщення Android: «час починати» навіть коли застосунок закритий ---------- */
+// Мітка часу для дати й часу в поясі з налаштувань
+function zonedMs(y, mo, d, h, mi) {
+  const want = Date.UTC(y, mo - 1, d, h, mi); let ms = want;
+  for (let k = 0; k < 2; k++) { const z = zp(ms); ms += want - Date.UTC(z.y, z.m - 1, z.d, z.h, z.min); }
+  return ms;
+}
+let remTimer = null, remSig = '';
+function planReminders() {
+  if (!NATIVE) return;
+  clearTimeout(remTimer); remTimer = setTimeout(scheduleReminders, 1200);
+}
+async function scheduleReminders() {
+  const ln = plug('LocalNotifications'); if (!ln) return;
+  const now = Date.now(), list = [];
+  if (state.remind !== false) {
+    const doneToday = hist().done;
+    for (let d = 0; d < 7; d++) {
+      const z = zp(now + d * 86400000);
+      state.routines.forEach((r, i) => {
+        if (!r.tasks.length || !r.days.includes(z.dow)) return;
+        if (d === 0 && doneToday[r.id]) return;
+        const [hh, mm] = r.start.split(':').map(Number), at = zonedMs(z.y, z.m, z.d, hh, mm);
+        if (at <= now + 20000) return;
+        const t = r.tasks[0];
+        list.push({ id: d * 100 + i + 1, title: T('remTitle', { name: rname(r) }), body: T('remBody', { task: `${t.icon} ${tname(t)}` }),
+          schedule: { at: new Date(at), allowWhileIdle: true } });
+      });
+    }
+  }
+  const sig = JSON.stringify(list.map(n => [n.id, +n.schedule.at, n.title, n.body]));
+  if (sig === remSig) return; // нічого не змінилось
+  try {
+    const p = await ln.getPending();
+    if (p.notifications.length) await ln.cancel({ notifications: p.notifications.map(n => ({ id: n.id })) });
+    if (list.length) await ln.schedule({ notifications: list });
+    remSig = sig;
+  } catch (e) {}
+}
+async function askNotify() {
+  const ln = plug('LocalNotifications'); if (!ln) return;
+  try {
+    const p = await ln.checkPermissions();
+    if (p.display !== 'granted') await ln.requestPermissions();
+  } catch (e) {}
+  remSig = ''; scheduleReminders();
+}
 function hist(k = dayKey()) {
   return state.history[k] || (state.history[k] = { stars: 0, done: {}, tasks: [] });
 }
@@ -596,10 +648,10 @@ function renderChild() {
     body = `${mascotImg(m >= 18 * 60 || m < 5 * 60 ? 'sleep' : 'wave')}<h1>${esc(T('free'))}</h1>
       <p class="muted">${nextR ? T('atTime', { t: nextR.start, name: esc(rname(nextR)) }) : esc(T('relax'))}</p>
       ${nextR ? `<div class="countdown" aria-live="polite">⏳ ${esc(inTime(hm(nextR.start) - m))}</div>` : ''}
-      ${list.length ? `<div class="today">${list.map(x => `
+      ${list.length ? `<div class="today">${list.map(x => `<div class="r-wrap">
         <button class="r-chip ${h.done[x.id] ? 'ok' : ''}" onclick="A.${h.done[x.id] ? 'again' : 'start'}('${x.id}')">
-          <span>${x.tasks[0].icon}</span><b>${esc(rname(x))}</b><small>${h.done[x.id] ? `${esc(T('doneMark'))}<em>${esc(T('againShort'))}</em>` : x.start}</small>
-        </button>`).join('')}</div>
+          <span>${x.tasks[0].icon}</span><b>${esc(rname(x))}</b><small>${h.done[x.id] ? esc(T('doneMark')) : x.start}</small>
+        </button>${h.done[x.id] ? `<button class="r-reset" onclick="A.undone('${x.id}')" aria-label="${esc(T('undoneAria'))}" title="${esc(T('undoneAria'))}">↺</button>` : ''}</div>`).join('')}</div>
         <div class="hint">${esc(T('startEarly'))}</div>`
       : `<p class="hint">${esc(T('noRoutinesChild'))}</p>`}`;
   }
@@ -792,6 +844,7 @@ function settingsHTML() {
     </div>
     <div class="card">
       <label class="switch">${esc(T('sound'))}<input type="checkbox" ${state.sound ? 'checked' : ''} onchange="A.sound(this.checked)"></label>
+      <label class="switch">${esc(T('remind'))}<input type="checkbox" ${state.remind !== false ? 'checked' : ''} onchange="A.remind(this.checked)"></label>
     </div>
     ${run ? `<div class="card"><b>${esc(T('running', { name: rname(routine(run.rid)) }))}</b>
       <div class="row"><button class="btn" onclick="A.skipTask()">${esc(T('skip'))}</button><button class="btn" onclick="A.stopRun()">${esc(T('stop'))}</button></div></div>` : ''}
@@ -931,6 +984,12 @@ const A = {
   setLang(l) { if (!LANGS.includes(l)) return; lang = state.settings.lang = l; document.documentElement.lang = l; save(); renderParent(); },
   setTz(z) { state.settings.tz = (z === 'auto' || validTz(z)) ? z : 'auto'; save(); validRun(); renderParent(); },
   sound(v) { state.sound = v; save(); if (v) { unlockAudio(); chime(); } },
+  remind(v) { state.remind = v; save(); if (v) askNotify(); },
+  // ↺ на плитці: зняти «готово» — розпорядок знову чекає свого часу (і запуститься сам, якщо час уже настав)
+  undone(id) {
+    const r = routine(id); if (!r) return;
+    delete hist().done[id]; save(); renderChild(); toast(T('undone', { name: rname(r) }));
+  },
   skipTask() {
     const run = validRun(); if (!run) return;
     const r = routine(run.rid); run.idx++; resetTask(run);
@@ -956,7 +1015,7 @@ window.A = A;
 function tick() {
   if (!validRun()) {
     const r = autoRoutine();
-    if (r) { state.finished = null; startRun(r); if (view === 'child' && !$('#modal')) renderChild(); }
+    if (r) { state.finished = null; startRun(r); if (view === 'child' && !$('#modal')) renderChild(); if (state.remind !== false) chime(); }
   }
   if (view === 'child') {
     const c = $('#clock'); if (c) c.textContent = clockNow();
@@ -972,6 +1031,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 document.addEventListener('pointerdown', unlockAudio, { once: true });
 
 load(); save(); renderChild();
+if (NATIVE && state.remind !== false) askNotify();
 setInterval(tick, 1000); tick();
 
 // Кнопка «Назад» на Android: закрити вікно → вийти з режиму дорослого → згорнути застосунок

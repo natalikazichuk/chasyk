@@ -82,9 +82,10 @@ jobs:
             adb shell am start -n io.github.natalikazichuk.chasyk/.MainActivity
             sleep 12
             adb exec-out screencap -p > out/1-start.png
-            adb shell input tap 540 1500 ; sleep 4
+            adb shell input tap 160 430 ; sleep 4
             adb exec-out screencap -p > out/2-tap.png
-            adb shell dumpsys window windows | grep -iE "KEEP_SCREEN_ON|mCurrentFocus" | head -5 > out/window.txt || true
+            adb shell dumpsys window | grep -iE "KEEP_SCREEN_ON|mCurrentFocus" | head -5 > out/window.txt || true
+            adb shell input keyevent 4 ; sleep 2 ; adb exec-out screencap -p > out/3-back-on-routine.png
             adb shell input keyevent 4 ; sleep 3
             adb shell dumpsys activity activities | grep -E "topResumedActivity|mResumedActivity" > out/after-back.txt || true
             adb logcat -d | grep -iE "Capacitor|chromium|AndroidRuntime" | tail -150 > out/logcat.txt || true

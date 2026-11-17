@@ -1,14 +1,14 @@
 {
-  "name": "CHASIK — трекер часу для дитини",
+  "name": "CHASIK — kids time tracker",
   "short_name": "CHASIK",
-  "description": "Простий трекер часу для дитини: справа, круг, що тане, і кнопка «Готово».",
+  "description": "A simple time tracker for kids: one task, a melting circle and a big “Done” button.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fdf8f0",
   "theme_color": "#5b8def",
-  "lang": "uk",
+  "lang": "en",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

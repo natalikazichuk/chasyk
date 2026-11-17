@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Часик</title>
+<meta name="description" content="Простой трекер времени для ребёнка: дело, тающий круг и кнопка «Готово».">
+<meta name="theme-color" content="#5b8def">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#fdf8f0;--card:#ffffff;--ink:#2d2a32;--muted:#857f8f;--line:#ece4d8;--track:#efe7da;
+  --accent:#5b8def;--green:#34b26a;--green-d:#25844d;--yellow:#f2b200;--red:#e8554e;--danger:#d64541;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#1c1a22;--card:#27242f;--ink:#f2eef7;--muted:#9c95a8;--line:#3a3542;--track:#332f3b;--green-d:#1d6b3f;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#1c1a22;--card:#27242f;--ink:#f2eef7;--muted:#9c95a8;--line:#3a3542;--track:#332f3b;--green-d:#1d6b3f;color-scheme:dark}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI Rounded","Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+#app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:10px 16px calc(16px + env(safe-area-inset-bottom))}
+.muted{color:var(--muted)}
+
+/* ---------- верхняя панель ---------- */
+.top{display:flex;align-items:center;gap:10px;min-height:56px}
+.who{font-weight:800;font-size:18px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stars{font-weight:800;font-size:20px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:4px 14px;white-space:nowrap}
+.gear{position:relative;width:48px;height:48px;flex:none;border:0;border-radius:50%;background:transparent;font-size:22px;opacity:.45;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.gear svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none}
+.gear circle{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round;stroke-dasharray:139;stroke-dashoffset:139}
+.gear.hold{opacity:1}
+.gear.hold circle{stroke-dashoffset:0;transition:stroke-dashoffset 3s linear}
+
+/* ---------- экран ребёнка ---------- */
+.child{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:8px 0}
+.now-label{text-transform:uppercase;letter-spacing:.14em;font-size:13px;font-weight:800;color:var(--muted)}
+.task-icon{font-size:clamp(64px,19vw,100px);line-height:1.1}
+.task-name{font-size:clamp(26px,7.5vw,38px);font-weight:900;line-height:1.15;overflow-wrap:anywhere}
+.timer{position:relative;width:min(58vw,260px);aspect-ratio:1;margin:6px auto 0}
+.timer svg{width:100%;height:100%;display:block}
+.t-bg{fill:var(--track);transition:fill .4s}
+.t-pie{fill:none;stroke-width:48;transition:stroke .6s}
+.timer.over .t-bg{fill:var(--red);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+.t-text b{display:block;font-size:clamp(28px,8vw,40px);font-weight:900;line-height:1.1}
+.t-text span{font-size:16px;color:var(--muted);font-weight:700}
+.timer.over + .t-text b{color:var(--red)}
+.btn-main{width:100%;max-width:420px;min-height:88px;margin-top:10px;border:0;border-radius:28px;background:var(--green);color:#fff;font-size:34px;font-weight:900;letter-spacing:.02em;box-shadow:0 7px 0 var(--green-d);transition:transform .08s,box-shadow .08s;user-select:none;-webkit-user-select:none}
+.btn-main:active{transform:translateY(5px);box-shadow:0 2px 0 var(--green-d)}
+.btn-main:focus-visible{outline:4px solid var(--accent);outline-offset:4px}
+.next{font-size:18px;color:var(--muted);margin-top:8px}
+.next span{color:var(--ink);font-weight:800}
+.dots{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--track)}
+.dots i.on{background:var(--green)}
+.dots i.cur{background:var(--accent);transform:scale(1.35)}
+.big-emoji{font-size:clamp(72px,22vw,110px);line-height:1.1}
+.child h1{font-size:clamp(28px,8vw,40px);font-weight:900}
+.child p{font-size:18px}
+.today{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;margin-top:14px}
+.r-chip{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:20px;border:2px solid var(--line);background:var(--card);text-align:left;min-height:64px}
+.r-chip span{font-size:30px}
+.r-chip b{flex:1;font-size:18px}
+.r-chip small{font-size:15px;color:var(--muted);font-weight:700}
+.r-chip.ok{opacity:.6}
+.r-chip.ok small{color:var(--green)}
+.hint{font-size:14px;color:var(--muted);margin-top:4px}
+.stars-row{font-size:34px;letter-spacing:4px;max-width:340px;line-height:1.3}
+
+.reward{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:10px 14px;font-weight:800}
+.reward .rw{flex:1;min-width:0}
+.reward .rw div{overflow-wrap:anywhere;line-height:1.25}
+.bar{height:10px;border-radius:5px;background:var(--track);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--yellow);border-radius:5px;transition:width .5s}
+.reward.got{border-color:var(--yellow)}
+
+.fly{position:fixed;left:50%;top:50%;font-size:64px;pointer-events:none;z-index:50;animation:fly 0.9s ease-out forwards}
+@keyframes fly{0%{transform:translate(-50%,-50%) scale(.6);opacity:0}25%{transform:translate(-50%,-60%) scale(1.3);opacity:1}100%{transform:translate(-50%,-260%) scale(.8);opacity:0}}
+
+/* ---------- окна и подсказки ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(20,16,28,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.modal{background:var(--card);border-radius:22px;padding:22px;width:100%;max-width:380px;max-height:86vh;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.modal h2{font-size:22px}
+.modal .q{font-size:26px;font-weight:900}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.emoji-grid button{font-size:28px;height:52px;border-radius:12px;border:1px solid var(--line);background:var(--bg)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;font-size:15px;z-index:60;max-width:calc(100% - 32px);text-align:center;animation:fade 2.4s forwards}
+@keyframes fade{0%{opacity:0}10%,80%{opacity:1}100%{opacity:0}}
+
+/* ---------- режим взрослого ---------- */
+.parent{display:flex;flex-direction:column;gap:12px;padding-bottom:24px}
+.parent h3{font-size:17px;margin-top:8px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.tabs button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:700;font-size:15px}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.r-head{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.r-head b{font-size:17px}
+.r-head .muted{font-size:14px;margin-top:2px}
+.r-icons{font-size:24px;letter-spacing:3px;overflow-wrap:anywhere}
+.btn,.btn-sm{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 16px;font-weight:700;min-height:44px}
+.btn-sm{padding:7px 12px;min-height:38px;font-size:14px;flex:none}
+.btn.primary,.btn-sm.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--danger)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.row .grow{flex:1}
+label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:var(--muted)}
+input[type=text],input[type=time],input[type=number],input[inputmode]{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;font-size:17px;color:var(--ink);width:100%;min-height:46px}
+input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-weight:700;font-size:14px;padding:0}
+.day.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.t-row{display:grid;grid-template-columns:50px 1fr;gap:8px 10px;align-items:center;padding:10px}
+.ico{height:50px;border-radius:14px;border:1px solid var(--line);background:var(--bg);font-size:28px}
+.t-row .t-bottom{grid-column:1/-1;flex-wrap:nowrap}
+.t-row input{min-height:42px;padding:8px 10px;font-size:16px}
+.t-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:6px}
+.step button,.t-tools button{width:40px;height:40px;flex:none;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-weight:800;font-size:18px}
+.step b{min-width:30px;text-align:center;font-size:17px}
+.step small{color:var(--muted);margin-right:2px}
+.t-tools{display:flex;gap:6px}
+.t-tools button:disabled{opacity:.3;cursor:default}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;font-weight:700;color:var(--ink);flex-direction:row}
+.switch input{width:24px;height:24px;accent-color:var(--accent)}
+.stat-row{display:grid;grid-template-columns:76px 1fr auto;gap:10px;align-items:center;font-size:15px}
+.stat-row .bar{margin:0;height:12px}
+.stat-row .bar i{background:var(--green)}
+.tip{font-size:15px;line-height:1.45}
+.tip b{font-weight:800}
+.small{font-size:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   Часик — трекер времени для ребёнка.
+   Всё хранится в localStorage на этом устройстве.
+   ========================================================= */
+const KEY = 'chasyk.v1';
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const pad = n => String(n).padStart(2, '0');
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const hm = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+const minsNow = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+const total = r => r.tasks.reduce((a, t) => a + t.min, 0);
+const rand = n => Math.floor(Math.random() * n);
+
+const ICONS = ['🛏️','🚿','🦷','🪥','👕','🧦','🧥','👟','🥣','🍲','🍽️','🍎','💧','💊','🎒','🚌','🚶','📚','✏️','📖','🎹','🎨','🧩','⚽','🤸','🐶','🌱','🧸','🧹','🗑️','🛁','🩳','😴','📵','🎮','📺','🛋️','⏰','🧘','📞'];
+const DOW = [[1,'Пн'],[2,'Вт'],[3,'Ср'],[4,'Чт'],[5,'Пт'],[6,'Сб'],[0,'Вс']];
+const WD = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+
+const TEMPLATES = [
+  { name: 'Утро в школу', start: '07:00', days: [1,2,3,4,5], tasks: [
+    ['🛏️','Встать и заправить кровать',3],['🚿','Умыться',3],['🦷','Почистить зубы',3],
+    ['👕','Одеться',5],['🥣','Завтрак',15],['🎒','Собрать рюкзак',5],['👟','Обуться',3]]},
+  { name: 'После школы', start: '14:00', days: [1,2,3,4,5], tasks: [
+    ['🍲','Обед',20],['🛋️','Отдых',30],['📚','Уроки',45],['🧸','Убрать комнату',10]]},
+  { name: 'Перед сном', start: '20:30', days: [0,1,2,3,4,5,6], tasks: [
+    ['🧸','Убрать игрушки',10],['🛁','Душ',10],['🦷','Почистить зубы',3],
+    ['🩳','Пижама',3],['📖','Книжка',15],['😴','Спать',1]]},
+  { name: 'Выходное утро', start: '09:00', days: [0,6], tasks: [
+    ['🛏️','Заправить кровать',3],['🦷','Почистить зубы',3],['👕','Одеться',5],['🥣','Завтрак',20]]},
+];
+const fromTemplate = t => ({ id: uid(), name: t.name, start: t.start, days: [...t.days],
+  tasks: t.tasks.map(([icon, name, min]) => ({ icon, name, min })) });
+
+/* ---------- состояние ---------- */
+let state;
+function load() {
+  try { state = JSON.parse(localStorage.getItem(KEY)); } catch (e) { state = null; }
+  if (!state || !Array.isArray(state.routines)) {
+    state = { routines: TEMPLATES.slice(0, 3).map(fromTemplate), run: null, history: {},
+      reward: { on: false, goal: 15, text: 'Выбрать мультик на вечер', stars: 0 }, sound: true, finished: null };
+  }
+  // храним историю только за 30 дней
+  const cut = dayKey(new Date(Date.now() - 30 * 864e5));
+  for (const k of Object.keys(state.history)) if (k < cut) delete state.history[k];
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function hist(k = dayKey()) {
+  return state.history[k] || (state.history[k] = { stars: 0, done: {}, tasks: [] });
+}
+const routine = id => state.routines.find(r => r.id === id);
+
+/* ---------- звук, вибрация, экран ---------- */
+let ac;
+function unlockAudio() {
+  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {}
+}
+function chime() {
+  try { navigator.vibrate && navigator.vibrate([200, 120, 200]); } catch (e) {}
+  if (!state.sound || !ac) return;
+  try {
+    [660, 880, 990].forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * 0.22;
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.22, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + 0.75);
+    });
+  } catch (e) {}
+}
+let wl = null;
+async function keepAwake(on) {
+  try {
+    if (on && !wl && 'wakeLock' in navigator && document.visibilityState === 'visible') {
+      wl = await navigator.wakeLock.request('screen');
+      wl.addEventListener('release', () => { wl = null; });
+    } else if (!on && wl) { await wl.release(); wl = null; }
+  } catch (e) {}
+}
+function toast(msg) {
+  document.querySelectorAll('.toast').forEach(n => n.remove());
+  const n = document.createElement('div'); n.className = 'toast'; n.textContent = msg;
+  document.body.appendChild(n); setTimeout(() => n.remove(), 2500);
+}
+function flyStar() {
+  const n = document.createElement('div'); n.className = 'fly'; n.textContent = '⭐';
+  document.body.appendChild(n); setTimeout(() => n.remove(), 1000);
+}
+
+/* ---------- логика распорядка ---------- */
+// Какой распорядок должен идти сейчас (по расписанию)
+function autoRoutine() {
+  const dow = new Date().getDay(), m = minsNow(), h = hist();
+  let best = null;
+  for (const r of state.routines) {
+    if (!r.days.includes(dow) || !r.tasks.length || h.done[r.id]) continue;
+    const s = hm(r.start), e = s + total(r) + 60; // окно: длительность + час запаса
+    if (m >= s && m < e && (!best || s > hm(best.start))) best = r;
+  }
+  return best;
+}
+function startRun(r) {
+  state.run = { rid: r.id, date: dayKey(), idx: 0, t0: Date.now(), alerted: false };
+  save();
+}
+function validRun() {
+  const run = state.run;
+  if (!run) return null;
+  const r = routine(run.rid);
+  if (run.date !== dayKey() || !r || run.idx >= r.tasks.length) { state.run = null; save(); return null; }
+  return run;
+}
+
+/* ---------- экран ребёнка ---------- */
+let view = 'child', pTab = 'routines', draft = null, lastDone = 0, idleSig = '';
+
+function gearHTML() {
+  return `<button class="gear" id="gear" aria-label="Для взрослых: удерживайте 3 секунды">
+    <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22"/></svg>⚙️</button>`;
+}
+function rewardHTML() {
+  const rw = state.reward;
+  if (!rw.on) return '';
+  const got = rw.stars >= rw.goal, p = Math.min(100, rw.stars / rw.goal * 100);
+  return `<footer class="reward ${got ? 'got' : ''}"><span style="font-size:28px">🎁</span>
+    <div class="rw"><div>${got ? 'Награда заработана! Скажи взрослому' : esc(rw.text)}</div>
+    <div class="bar"><i style="width:${p}%"></i></div></div>
+    <div>${Math.min(rw.stars, rw.goal)}/${rw.goal}⭐</div></footer>`;
+}
+
+function renderChild() {
+  view = 'child';
+  const h = hist(), run = validRun(), r = run && routine(run.rid);
+  let body;
+  if (state.finished) {
+    const f = state.finished;
+    body = `<div class="big-emoji">🎉</div><h1>Молодец!</h1>
+      <p>«${esc(f.name)}» — всё сделано</p>
+      <div class="stars-row">${'⭐'.repeat(Math.min(f.stars, 12))}</div>
+      <button class="btn-main" onclick="A.closeFinish()">Ура!</button>`;
+  } else if (r) {
+    const t = r.tasks[run.idx], nx = r.tasks[run.idx + 1];
+    body = `<div class="now-label">Сейчас</div>
+      <div class="task-icon">${t.icon}</div>
+      <h1 class="task-name">${esc(t.name)}</h1>
+      <div class="timer" id="timer"><svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="t-bg" cx="50" cy="50" r="48"/>
+        <circle class="t-pie" id="pie" cx="50" cy="50" r="24" transform="rotate(-90 50 50)" stroke-dasharray="0 151"/>
+      </svg></div>
+      <div class="t-text" aria-live="polite"><b id="tBig"></b><span id="tSmall"></span></div>
+      <button class="btn-main" onclick="A.done()">✓ Готово</button>
+      <div class="next">${nx ? `Дальше: <span>${nx.icon} ${esc(nx.name)}</span>` : 'Это последнее дело! 💪'}</div>
+      <div class="dots">${r.tasks.map((x, i) => `<i class="${i < run.idx ? 'on' : i === run.idx ? 'cur' : ''}"></i>`).join('')}</div>`;
+  } else {
+    const dow = new Date().getDay(), m = minsNow();
+    const list = state.routines.filter(x => x.days.includes(dow) && x.tasks.length).sort((a, b) => hm(a.start) - hm(b.start));
+    const nextR = list.find(x => hm(x.start) > m && !h.done[x.id]);
+    body = `<div class="big-emoji">🎈</div><h1>Свободное время</h1>
+      <p class="muted">${nextR ? `В ${nextR.start} — «${esc(nextR.name)}»` : 'Можно отдыхать'}</p>
+      ${list.length ? `<div class="today">${list.map(x => `
+        <button class="r-chip ${h.done[x.id] ? 'ok' : ''}" ${h.done[x.id] ? 'disabled' : ''} onclick="A.start('${x.id}')">
+          <span>${x.tasks[0].icon}</span><b>${esc(x.name)}</b><small>${h.done[x.id] ? '✓ готово' : x.start}</small>
+        </button>`).join('')}</div>
+        <div class="hint">Можно начать раньше — нажми на карточку</div>`
+      : `<p class="hint">На сегодня распорядков нет. Взрослый может добавить их в настройках ⚙️</p>`}`;
+  }
+  app.innerHTML = `<header class="top"><div class="who">${r ? esc(r.name) : 'Часик'}</div>
+    <div class="stars" title="Звёзды за сегодня">⭐ ${h.stars}</div>${gearHTML()}</header>
+    <main class="child">${body}</main>${rewardHTML()}`;
+  bindGear();
+  updateTimer();
+}
+
+function updateTimer() {
+  const run = state.run, r = run && routine(run.rid), pie = $('#pie');
+  if (!r || !pie || view !== 'child' || state.finished) return;
+  const t = r.tasks[run.idx], plan = t.min * 60000, el = Date.now() - run.t0;
+  const left = plan - el, f = Math.max(0, left / plan);
+  pie.setAttribute('stroke-dasharray', `${(f * 150.8).toFixed(2)} 151`);
+  pie.style.stroke = f > 0.5 ? 'var(--green)' : f > 0.25 ? 'var(--yellow)' : 'var(--red)';
+  $('#timer').classList.toggle('over', left <= 0);
+  const big = $('#tBig'), small = $('#tSmall');
+  if (left > 0) {
+    const s = Math.ceil(left / 1000);
+    big.textContent = s >= 60 ? `${Math.ceil(s / 60)} мин` : `${s} сек`;
+    small.textContent = 'осталось';
+  } else {
+    const over = Math.floor(-left / 60000);
+    big.textContent = 'Время вышло';
+    small.textContent = over > 0 ? `+${over} мин · заканчивай и жми «Готово»` : 'заканчивай и жми «Готово»';
+    if (!run.alerted) { run.alerted = true; save(); chime(); }
+  }
+}
+
+function bindGear() {
+  const g = $('#gear'); if (!g) return;
+  let t = null, t0 = 0;
+  const cancel = () => { clearTimeout(t); t = null; g.classList.remove('hold'); };
+  g.addEventListener('pointerdown', e => {
+    e.preventDefault(); t0 = Date.now(); g.classList.add('hold');
+    t = setTimeout(() => { cancel(); A.gate(); }, 3000);
+  });
+  g.addEventListener('pointerup', () => { if (t && Date.now() - t0 < 2500) toast('Для взрослых: удерживайте ⚙️ 3 секунды'); cancel(); });
+  g.addEventListener('pointerleave', cancel);
+  g.addEventListener('pointercancel', cancel);
+  g.addEventListener('contextmenu', e => e.preventDefault());
+  g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); A.gate(); } });
+}
+
+/* ---------- окна ---------- */
+function modal(html) {
+  closeModal();
+  const bg = document.createElement('div'); bg.className = 'modal-bg'; bg.id = 'modal';
+  bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${html}</div>`;
+  bg.addEventListener('click', e => { if (e.target === bg) closeModal(); });
+  document.body.appendChild(bg);
+}
+function closeModal() { const m = $('#modal'); if (m) m.remove(); }
+let gateAns = 0;
+function confirmBox(text, okLabel, fn) {
+  modal(`<h2>${text}</h2><div class="row end"><button class="btn" onclick="A.closeModal()">Отмена</button>
+    <button class="btn primary" id="okBtn">${okLabel}</button></div>`);
+  $('#okBtn').onclick = () => { closeModal(); fn(); };
+}
+
+/* ---------- режим взрослого ---------- */
+function daysLabel(d) {
+  const s = [...d].sort().join();
+  if (s === '0,1,2,3,4,5,6') return 'каждый день';
+  if (s === '1,2,3,4,5') return 'будни';
+  if (s === '0,6') return 'выходные';
+  if (!d.length) return 'дни не выбраны';
+  return DOW.filter(([n]) => d.includes(n)).map(([, l]) => l).join(', ');
+}
+
+function renderParent() {
+  view = 'parent';
+  let content;
+  if (draft) content = editorHTML();
+  else if (pTab === 'routines') content = routinesHTML();
+  else if (pTab === 'stats') content = statsHTML();
+  else if (pTab === 'reward') content = rewardTabHTML();
+  else content = moreHTML();
+  const tabs = [['routines','Распорядки'],['stats','Итоги'],['reward','Награда'],['more','Ещё']];
+  app.innerHTML = `<header class="top"><div class="who">Режим взрослого</div>
+      <button class="btn-sm primary" onclick="A.exitParent()">К ребёнку →</button></header>
+    ${draft ? '' : `<nav class="tabs">${tabs.map(([k, l]) => `<button class="${pTab === k ? 'on' : ''}" onclick="A.tab('${k}')">${l}</button>`).join('')}</nav>`}
+    <main class="parent">${content}</main>`;
+}
+
+function routinesHTML() {
+  const list = [...state.routines].sort((a, b) => hm(a.start) - hm(b.start));
+  return `${list.length ? list.map(r => `<div class="card">
+      <div class="r-head"><div><b>${esc(r.name)}</b>
+        <div class="muted">${r.start} · ${daysLabel(r.days)} · ${r.tasks.length} дел · ${total(r)} мин</div></div>
+        <button class="btn-sm" onclick="A.edit('${r.id}')">Изменить</button></div>
+      <div class="r-icons">${r.tasks.map(t => t.icon).join(' ')}</div></div>`).join('')
+    : '<p class="muted">Пока нет распорядков. Добавьте свой или возьмите шаблон.</p>'}
+    <button class="btn primary" onclick="A.edit()">+ Новый распорядок</button>
+    <h3>Шаблоны</h3>
+    <div class="row">${TEMPLATES.map((t, i) => `<button class="btn" onclick="A.fromTpl(${i})">+ ${esc(t.name)}</button>`).join('')}</div>
+    <p class="small muted">Распорядок включается сам в указанное время и идёт, пока ребёнок не закончит (или ещё час после планового конца).</p>`;
+}
+
+function editorHTML() {
+  const d = draft;
+  return `<div class="card">
+      <label>Название<input type="text" value="${esc(d.name)}" maxlength="40" oninput="A.dset('name',this.value)"></label>
+      <label>Начало<input type="time" value="${d.start}" onchange="A.dset('start',this.value)"></label>
+      <div class="days">${DOW.map(([n, l]) => `<button class="day ${d.days.includes(n) ? 'on' : ''}" onclick="A.dday(${n})" aria-pressed="${d.days.includes(n)}">${l}</button>`).join('')}</div>
+    </div>
+    <h3>Дела <span class="muted">· всего ${total(d)} мин</span></h3>
+    ${d.tasks.map((t, i) => `<div class="card t-row">
+      <button class="ico" onclick="A.pick(${i})" aria-label="Сменить картинку">${t.icon}</button>
+      <input type="text" value="${esc(t.name)}" maxlength="40" oninput="A.tset(${i},this.value)" aria-label="Название дела">
+      <div class="t-bottom">
+        <div class="step"><button onclick="A.tmin(${i},-1)" aria-label="Меньше">−</button><b>${t.min}</b><small>мин</small><button onclick="A.tmin(${i},1)" aria-label="Больше">+</button></div>
+        <div class="t-tools"><button onclick="A.tmove(${i},-1)" ${i ? '' : 'disabled'} aria-label="Выше">↑</button><button onclick="A.tmove(${i},1)" ${i < d.tasks.length - 1 ? '' : 'disabled'} aria-label="Ниже">↓</button><button onclick="A.tdel(${i})" aria-label="Удалить">✕</button></div>
+      </div></div>`).join('')}
+    <button class="btn" onclick="A.tadd()">+ Добавить дело</button>
+    <div class="row end" style="margin-top:8px">
+      ${d.isNew ? '' : '<button class="btn danger" onclick="A.rdel()">Удалить</button>'}
+      <span class="grow"></span>
+      <button class="btn" onclick="A.cancelEdit()">Отмена</button>
+      <button class="btn primary" onclick="A.save()">Сохранить</button></div>`;
+}
+
+function statsHTML() {
+  const rows = [];
+  let maxStars = 1;
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 864e5), h = state.history[dayKey(d)];
+    const st = h ? h.stars : 0, late = h ? h.tasks.filter(t => t.late).length : 0;
+    maxStars = Math.max(maxStars, st);
+    rows.push({ label: i === 0 ? 'Сегодня' : `${WD[d.getDay()]} ${d.getDate()}`, st, late });
+  }
+  // где не хватает времени
+  const agg = {};
+  for (const h of Object.values(state.history)) for (const t of h.tasks) {
+    const k = t.icon + ' ' + t.name;
+    const a = agg[k] || (agg[k] = { n: 0, late: 0, sum: 0, plan: t.plan });
+    a.n++; a.late += t.late ? 1 : 0; a.sum += t.actual; a.plan = t.plan;
+  }
+  const hard = Object.entries(agg).filter(([, a]) => a.n >= 2 && a.late / a.n >= 0.5)
+    .sort((x, y) => y[1].late / y[1].n - x[1].late / x[1].n).slice(0, 5);
+  const any = Object.keys(agg).length;
+  return `<div class="card"><b>Звёзды за неделю</b>
+    ${rows.map(r => `<div class="stat-row"><span>${r.label}</span><div class="bar"><i style="width:${r.st / maxStars * 100}%"></i></div>
+      <span>⭐ ${r.st}${r.late ? ` <span class="muted">· ⏰${r.late}</span>` : ''}</span></div>`).join('')}
+    <p class="small muted">⏰ — сколько дел заняли больше времени, чем запланировано.</p></div>
+    <div class="card"><b>Где не хватает времени</b>
+    ${!any ? '<p class="tip muted">Данных пока нет — они появятся после первых выполненных дел.</p>'
+      : hard.length ? hard.map(([k, a]) => `<p class="tip"><b>${esc(k)}</b> — не успевает ${a.late} из ${a.n} раз, в среднем ${Math.round(a.sum / a.n)} мин вместо ${a.plan}. Попробуйте дать ${Math.ceil(a.sum / a.n)} мин.</p>`).join('')
+      : '<p class="tip">Пока всё успевается 👍</p>'}</div>`;
+}
+
+function rewardTabHTML() {
+  const rw = state.reward, got = rw.stars >= rw.goal;
+  return `<div class="card">
+      <label class="switch">Копить звёзды на награду<input type="checkbox" ${rw.on ? 'checked' : ''} onchange="A.rset('on',this.checked)"></label>
+      <label>Награда<input type="text" value="${esc(rw.text)}" maxlength="60" oninput="A.rset('text',this.value)"></label>
+      <div class="t-bottom"><span style="font-weight:700">Сколько звёзд нужно</span>
+        <div class="step"><button onclick="A.rgoal(-5)">−</button><b>${rw.goal}</b><small>⭐</small><button onclick="A.rgoal(5)">+</button></div></div>
+    </div>
+    <div class="card"><b>Сейчас: ${rw.stars} из ${rw.goal} ⭐</b>
+      <div class="bar"><i style="width:${Math.min(100, rw.stars / rw.goal * 100)}%"></i></div>
+      ${got ? `<button class="btn primary" onclick="A.rgive()">Награда выдана — копим заново</button>` : '<p class="small muted">Звезда даётся за каждое сделанное дело. Звёзды не отнимаются.</p>'}
+    </div>`;
+}
+
+function moreHTML() {
+  const run = validRun();
+  return `<div class="card">
+      <label class="switch">Звук, когда время вышло<input type="checkbox" ${state.sound ? 'checked' : ''} onchange="A.sound(this.checked)"></label>
+    </div>
+    ${run ? `<div class="card"><b>Идёт: «${esc(routine(run.rid).name)}»</b>
+      <div class="row"><button class="btn" onclick="A.skipTask()">Пропустить текущее дело</button><button class="btn" onclick="A.stopRun()">Остановить</button></div></div>` : ''}
+    <div class="card"><b>Как поставить на телефон или планшет</b>
+      <p class="small">Откройте страницу в браузере. Android (Chrome): меню ⋮ → «Добавить на главный экран». iPhone/iPad (Safari): «Поделиться» → «На экран „Домой“». После этого «Часик» работает без интернета.</p>
+      <p class="small muted">Все данные хранятся только на этом устройстве.</p></div>
+    <button class="btn danger" onclick="A.reset()">Сбросить все данные</button>`;
+}
+
+/* ---------- действия ---------- */
+const A = {
+  done() {
+    const run = validRun(); if (!run) return renderChild();
+    if (Date.now() - lastDone < 900) return; // защита от двойного нажатия
+    lastDone = Date.now(); unlockAudio();
+    const r = routine(run.rid), t = r.tasks[run.idx], h = hist();
+    const actual = (Date.now() - run.t0) / 60000;
+    h.tasks.push({ icon: t.icon, name: t.name, plan: t.min, actual: Math.round(actual * 10) / 10, late: actual > t.min });
+    h.stars++;
+    if (state.reward.on) state.reward.stars++;
+    run.idx++;
+    if (run.idx >= r.tasks.length) {
+      h.done[r.id] = true;
+      state.finished = { name: r.name, stars: r.tasks.length };
+      state.run = null;
+    } else { run.t0 = Date.now(); run.alerted = false; }
+    save(); flyStar();
+    try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+    renderChild();
+  },
+  start(id) { unlockAudio(); const r = routine(id); if (r) { startRun(r); renderChild(); } },
+  closeFinish() { state.finished = null; save(); renderChild(); },
+  gate() {
+    const a = 12 + rand(8), b = 3 + rand(7); gateAns = a * b;
+    modal(`<h2>Для взрослых</h2><div class="q">${a} × ${b} = ?</div>
+      <input id="gateIn" inputmode="numeric" autocomplete="off" aria-label="Ответ">
+      <div class="row end"><button class="btn" onclick="A.closeModal()">Отмена</button>
+      <button class="btn primary" onclick="A.checkGate()">Войти</button></div>`);
+    const i = $('#gateIn'); i.focus();
+    i.addEventListener('keydown', e => { if (e.key === 'Enter') A.checkGate(); });
+  },
+  checkGate() {
+    const i = $('#gateIn');
+    if (parseInt(i.value, 10) === gateAns) { closeModal(); pTab = 'routines'; draft = null; renderParent(); }
+    else { const m = $('.modal'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake'); i.value = ''; i.focus(); }
+  },
+  closeModal,
+  exitParent() {
+    if (draft) return confirmBox('Выйти без сохранения изменений?', 'Выйти', () => { draft = null; renderChild(); });
+    renderChild();
+  },
+  tab(k) { pTab = k; renderParent(); },
+  edit(id) {
+    const r = id && routine(id);
+    draft = r ? JSON.parse(JSON.stringify(r))
+      : { id: uid(), name: 'Новый распорядок', start: '08:00', days: [1,2,3,4,5], tasks: [{ icon: '⏰', name: 'Первое дело', min: 5 }], isNew: true };
+    renderParent(); window.scrollTo(0, 0);
+  },
+  fromTpl(i) { draft = { ...fromTemplate(TEMPLATES[i]), isNew: true }; renderParent(); window.scrollTo(0, 0); },
+  dset(k, v) { draft[k] = v; },
+  dday(n) { const d = draft.days; const i = d.indexOf(n); i >= 0 ? d.splice(i, 1) : d.push(n); renderParent(); },
+  tset(i, v) { draft.tasks[i].name = v; },
+  tmin(i, dir) {
+    const t = draft.tasks[i];
+    t.min = dir > 0 ? (t.min < 10 ? t.min + 1 : t.min + 5) : (t.min <= 10 ? t.min - 1 : t.min - 5);
+    t.min = Math.max(1, Math.min(180, t.min)); renderParent();
+  },
+  tmove(i, dir) { const a = draft.tasks, j = i + dir; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; renderParent(); },
+  tdel(i) { draft.tasks.splice(i, 1); renderParent(); },
+  tadd() { draft.tasks.push({ icon: '⏰', name: '', min: 5 }); renderParent(); const ins = document.querySelectorAll('.t-row input'); ins[ins.length - 1]?.focus(); },
+  pick(i) {
+    modal(`<h2>Картинка</h2><div class="emoji-grid">${ICONS.map(e => `<button onclick="A.setIcon(${i},'${e}')">${e}</button>`).join('')}</div>
+      <button class="btn" onclick="A.closeModal()">Отмена</button>`);
+  },
+  setIcon(i, e) { draft.tasks[i].icon = e; closeModal(); renderParent(); },
+  cancelEdit() { draft = null; renderParent(); },
+  save() {
+    const d = draft;
+    d.name = d.name.trim() || 'Распорядок';
+    d.tasks = d.tasks.map(t => ({ ...t, name: t.name.trim() })).filter(t => t.name);
+    if (!d.tasks.length) return toast('Добавьте хотя бы одно дело с названием');
+    if (!d.days.length) return toast('Выберите хотя бы один день');
+    delete d.isNew;
+    const i = state.routines.findIndex(r => r.id === d.id);
+    i >= 0 ? (state.routines[i] = d) : state.routines.push(d);
+    draft = null; save(); validRun(); renderParent(); toast('Сохранено');
+  },
+  rdel() {
+    confirmBox(`Удалить «${esc(draft.name)}»?`, 'Удалить', () => {
+      state.routines = state.routines.filter(r => r.id !== draft.id);
+      draft = null; save(); validRun(); renderParent();
+    });
+  },
+  rset(k, v) { state.reward[k] = v; save(); if (k === 'on') renderParent(); },
+  rgoal(d) { state.reward.goal = Math.max(5, Math.min(200, state.reward.goal + d)); save(); renderParent(); },
+  rgive() { state.reward.stars = Math.max(0, state.reward.stars - state.reward.goal); save(); renderParent(); toast('Копим на следующую награду'); },
+  sound(v) { state.sound = v; save(); if (v) { unlockAudio(); chime(); } },
+  skipTask() {
+    const run = validRun(); if (!run) return;
+    const r = routine(run.rid); run.idx++; run.t0 = Date.now(); run.alerted = false;
+    if (run.idx >= r.tasks.length) { hist().done[r.id] = true; state.run = null; }
+    save(); renderParent(); toast('Дело пропущено');
+  },
+  stopRun() {
+    const run = validRun(); if (!run) return;
+    hist().done[run.rid] = true; // чтобы не запустился снова сегодня
+    state.run = null; save(); renderParent(); toast('Распорядок остановлен');
+  },
+  reset() {
+    confirmBox('Удалить все распорядки, звёзды и историю? Это нельзя отменить.', 'Удалить всё', () => {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      load(); save(); draft = null; renderParent(); toast('Данные сброшены');
+    });
+  },
+};
+window.A = A;
+
+/* ---------- основной цикл ---------- */
+function tick() {
+  if (!validRun()) {
+    const r = autoRoutine();
+    if (r) { state.finished = null; startRun(r); if (view === 'child' && !$('#modal')) renderChild(); }
+  }
+  if (view === 'child') {
+    if (state.run) updateTimer();
+    else {
+      const sig = dayKey() + minsNow() + (state.finished ? 'f' : '');
+      if (sig !== idleSig) { idleSig = sig; if (!$('#modal')) renderChild(); }
+    }
+  }
+  keepAwake(!!state.run && view === 'child');
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { wl = null; tick(); } });
+document.addEventListener('pointerdown', unlockAudio, { once: true });
+
+load(); save(); renderChild();
+setInterval(tick, 1000); tick();
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

@@ -61,6 +61,8 @@ input,select{font:inherit;color:inherit}
 .ctrl{display:flex;gap:10px;width:100%;max-width:420px;margin-top:14px}
 .ctrl button{flex:1;min-height:52px;border-radius:18px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;font-weight:800}
 .ctrl button:active{transform:translateY(2px)}
+.ctrl button{font-size:16px;padding:0 6px;white-space:nowrap}
+.r-chip.ok{cursor:pointer}
 .btn-main.resume{background:var(--accent);box-shadow:0 7px 0 #3f6fc9}
 .timer.paused{opacity:.45}
 .paused-label{font-size:20px;font-weight:900;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
@@ -179,7 +181,7 @@ const DICT = {
     langName: 'Українська', appName: 'Часик',
     now: 'Зараз', next: 'Далі', last: 'Це остання справа! 💪', done: '✓ Готово',
     min: 'хв', sec: 'с', left: 'залишилось', timeUp: 'Час вийшов', finishUp: 'закінчуй і тисни «Готово»',
-    wellDone: 'Молодець!', allDone: '«{name}» — усе зроблено', hooray: 'Ура!',
+    wellDone: 'Молодець!', allDone: '«{name}» — усе зроблено', hooray: 'Ура!', back: '↩️ Назад', againAsk: 'Почати «{name}» ще раз?', againYes: 'Почати',
     free: 'Вільний час', atTime: 'О {t} — «{name}»', relax: 'Можна відпочивати', inTime: 'через {t}', hr: 'год', pause: '⏸️ Пауза', resume: '▶️ Продовжити', paused: 'Пауза', stopShort: '⏹️ Стоп', stopAsk: 'Зупинити «{name}»?', stopYes: 'Зупинити', clockTitle: 'Котра година',
     startEarly: 'Можна почати раніше — натисни на картку', noRoutinesChild: 'На сьогодні розпорядків немає. Дорослий може додати їх у налаштуваннях ⚙️',
     doneMark: '✓ готово', starsToday: 'Зірки за сьогодні', rewardGot: 'Нагороду зароблено! Скажи дорослому',
@@ -227,7 +229,7 @@ const DICT = {
     langName: 'English', appName: 'Chasyk',
     now: 'Now', next: 'Next', last: 'Last one! 💪', done: '✓ Done',
     min: 'min', sec: 'sec', left: 'left', timeUp: 'Time’s up', finishUp: 'finish up and tap “Done”',
-    wellDone: 'Well done!', allDone: '“{name}” — all done', hooray: 'Hooray!',
+    wellDone: 'Well done!', allDone: '“{name}” — all done', hooray: 'Hooray!', back: '↩️ Back', againAsk: 'Start “{name}” again?', againYes: 'Start',
     free: 'Free time', atTime: 'At {t} — “{name}”', relax: 'Time to relax', inTime: 'in {t}', hr: 'h', pause: '⏸️ Pause', resume: '▶️ Resume', paused: 'Paused', stopShort: '⏹️ Stop', stopAsk: 'Stop “{name}”?', stopYes: 'Stop', clockTitle: 'Current time',
     startEarly: 'You can start early — tap a card', noRoutinesChild: 'No routines today. A grown-up can add them in settings ⚙️',
     doneMark: '✓ done', starsToday: 'Stars today', rewardGot: 'Reward earned! Tell a grown-up',
@@ -275,7 +277,7 @@ const DICT = {
     langName: 'Русский', appName: 'Часик',
     now: 'Сейчас', next: 'Дальше', last: 'Это последнее дело! 💪', done: '✓ Готово',
     min: 'мин', sec: 'сек', left: 'осталось', timeUp: 'Время вышло', finishUp: 'заканчивай и жми «Готово»',
-    wellDone: 'Молодец!', allDone: '«{name}» — всё сделано', hooray: 'Ура!',
+    wellDone: 'Молодец!', allDone: '«{name}» — всё сделано', hooray: 'Ура!', back: '↩️ Назад', againAsk: 'Начать «{name}» ещё раз?', againYes: 'Начать',
     free: 'Свободное время', atTime: 'В {t} — «{name}»', relax: 'Можно отдыхать', inTime: 'через {t}', hr: 'ч', pause: '⏸️ Пауза', resume: '▶️ Продолжить', paused: 'Пауза', stopShort: '⏹️ Стоп', stopAsk: 'Остановить «{name}»?', stopYes: 'Остановить', clockTitle: 'Который час',
     startEarly: 'Можно начать раньше — нажми на карточку', noRoutinesChild: 'На сегодня распорядков нет. Взрослый может добавить их в настройках ⚙️',
     doneMark: '✓ готово', starsToday: 'Звёзды за сегодня', rewardGot: 'Награда заработана! Скажи взрослому',
@@ -493,6 +495,7 @@ function autoRoutine() {
 }
 function startRun(r) {
   state.run = { rid: r.id, date: dayKey(), s0: Date.now(), idx: 0, t0: Date.now(), alerted: false };
+  state.undo = []; // кроки для «↩️ Назад» — лише в межах цього розпорядку
   save();
 }
 function validRun() {
@@ -507,6 +510,13 @@ function validRun() {
 
 /* ---------- екран дитини ---------- */
 // Якщо змінили розпорядок, що зараз іде: лишаємо дитину на тій самій справі, а якщо її прибрали — таймер з нуля
+// Чи є що повертати: останній крок належить розпорядку, що зараз іде (або щойно закінчився)
+function canUndo() {
+  const u = state.undo && state.undo[state.undo.length - 1];
+  if (!u) return false;
+  if (state.run) return state.run.rid === u.rid && state.run.idx === u.idx + 1;
+  return !!state.finished && u.last;
+}
 // Таймер поточної справи з нуля (і на паузі теж)
 function resetTask(run) { run.t0 = Date.now(); if (run.paused) run.paused = run.t0; run.alerted = false; }
 function fixRun(old, d) {
@@ -549,7 +559,8 @@ function renderChild() {
     body = `<div class="big-emoji">🎉</div><h1>${esc(T('wellDone'))}</h1>
       <p>${T('allDone', { name: esc(f.name) })}</p>
       <div class="stars-row">${'⭐'.repeat(Math.min(f.stars, 12))}</div>
-      <button class="btn-main" onclick="A.closeFinish()">${esc(T('hooray'))}</button>`;
+      <button class="btn-main" onclick="A.closeFinish()">${esc(T('hooray'))}</button>
+      ${canUndo() ? `<div class="ctrl"><button onclick="A.undo()">${esc(T('back'))}</button></div>` : ''}`;
   } else if (r) {
     const t = r.tasks[run.idx], nx = r.tasks[run.idx + 1];
     body = `<div class="now-label">${esc(T('now'))}</div>
@@ -563,7 +574,7 @@ function renderChild() {
       ${run.paused
         ? `<div class="paused-label">${esc(T('paused'))}</div><button class="btn-main resume" onclick="A.resume()">${esc(T('resume'))}</button>`
         : `<button class="btn-main" onclick="A.done()">${esc(T('done'))}</button>`}
-      <div class="ctrl">${run.paused ? '' : `<button onclick="A.pause()">${esc(T('pause'))}</button>`}<button onclick="A.stopChild()">${esc(T('stopShort'))}</button></div>
+      <div class="ctrl">${canUndo() ? `<button onclick="A.undo()">${esc(T('back'))}</button>` : ''}${run.paused ? '' : `<button onclick="A.pause()">${esc(T('pause'))}</button>`}<button onclick="A.stopChild()">${esc(T('stopShort'))}</button></div>
       <div class="next">${nx ? `${esc(T('next'))}: <span>${nx.icon} ${esc(tname(nx))}</span>` : esc(T('last'))}</div>
       <div class="dots">${r.tasks.map((x, i) => `<i class="${i < run.idx ? 'on' : i === run.idx ? 'cur' : ''}"></i>`).join('')}</div>`;
   } else {
@@ -574,7 +585,7 @@ function renderChild() {
       <p class="muted">${nextR ? T('atTime', { t: nextR.start, name: esc(rname(nextR)) }) : esc(T('relax'))}</p>
       ${nextR ? `<div class="countdown" aria-live="polite">⏳ ${esc(inTime(hm(nextR.start) - m))}</div>` : ''}
       ${list.length ? `<div class="today">${list.map(x => `
-        <button class="r-chip ${h.done[x.id] ? 'ok' : ''}" ${h.done[x.id] ? 'disabled' : ''} onclick="A.start('${x.id}')">
+        <button class="r-chip ${h.done[x.id] ? 'ok' : ''}" onclick="A.${h.done[x.id] ? 'again' : 'start'}('${x.id}')">
           <span>${x.tasks[0].icon}</span><b>${esc(rname(x))}</b><small>${h.done[x.id] ? esc(T('doneMark')) : x.start}</small>
         </button>`).join('')}</div>
         <div class="hint">${esc(T('startEarly'))}</div>`
@@ -786,6 +797,7 @@ const A = {
     lastDone = Date.now(); unlockAudio();
     const r = routine(run.rid), t = r.tasks[run.idx], h = hist(run.date);
     const actual = (Date.now() - run.t0) / 60000;
+    (state.undo || (state.undo = [])).push({ rid: run.rid, date: run.date, s0: run.s0, idx: run.idx, t0: run.t0, reward: !!state.reward.on, last: run.idx + 1 >= r.tasks.length });
     h.tasks.push({ icon: t.icon, tk: t.tk, name: tname(t), plan: t.min, actual: Math.round(actual * 10) / 10, late: actual > t.min });
     h.stars++;
     if (state.reward.on) state.reward.stars++;
@@ -798,6 +810,24 @@ const A = {
     save(); flyStar();
     try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
     renderChild();
+  },
+  // ↩️ Назад: скасувати останнє «Готово» (зірку, запис у підсумках) і повернутися до тієї справи
+  undo() {
+    const u = canUndo() && state.undo.pop(); if (!u) return renderChild();
+    const h = hist(u.date), i = h.tasks.length - 1;
+    if (i >= 0) h.tasks.splice(i, 1);
+    h.stars = Math.max(0, h.stars - 1);
+    if (u.reward && state.reward.stars > 0) state.reward.stars--;
+    if (u.last) { delete h.done[u.rid]; state.finished = null; }
+    state.run = { rid: u.rid, date: u.date, s0: u.s0, idx: u.idx, t0: u.t0, alerted: false };
+    save(); renderChild();
+  },
+  // Зроблений сьогодні розпорядок можна почати ще раз
+  again(id) {
+    const r = routine(id); if (!r) return;
+    confirmBox(esc(T('againAsk', { name: rname(r) })), T('againYes'), () => {
+      delete hist().done[id]; state.finished = null; unlockAudio(); startRun(r); renderChild();
+    });
   },
   pause() {
     const run = validRun(); if (!run || run.paused) return;

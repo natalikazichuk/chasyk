@@ -1,5 +1,5 @@
 // CHASIK: офлайн-кэш. Сначала сеть (чтобы обновления приходили), без сети — кэш.
-const CACHE = 'chasyk-v9';
+const CACHE = 'chasyk-v10';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './img/m-wave.webp', './img/m-sleep.webp', './img/m-school.webp', './img/m-sport.webp'];
 
 self.addEventListener('install', e => {

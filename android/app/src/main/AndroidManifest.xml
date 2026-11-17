@@ -34,4 +34,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- сповіщення «час починати» рівно в заданий час -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 </manifest>
